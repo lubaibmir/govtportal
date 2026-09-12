@@ -14,7 +14,9 @@ from app.db.models import Consent, DataRequest, User, AuditLog
 from app.adapters.revenue import RevenueAdapter
 from app.adapters.education import EducationAdapter
 from app.adapters.industries import IndustriesAdapter
+from app.adapters.skills import SkillsAdapter
 from app.schemas.canonical import CanonicalDataMapper
+from app.core.resilience import resilience_manager
 
 router = APIRouter(prefix="/data-requests", tags=["Interoperability & Data Exchange Core"])
 
@@ -43,7 +45,8 @@ def is_datetime_expired(expires_at: datetime) -> bool:
 ADAPTER_MAP = {
     "dept_revenue": RevenueAdapter(),
     "dept_education": EducationAdapter(),
-    "dept_industries": IndustriesAdapter()
+    "dept_industries": IndustriesAdapter(),
+    "dept_skills": SkillsAdapter()
 }
 
 @router.post("", response_model=DataExchangeResponse, summary="Execute Inter-Department Data Exchange (Consent Verified)")
@@ -89,9 +92,10 @@ async def execute_data_exchange(
             detail=f"No adapter registered for department '{req.providing_department_id}'"
         )
 
-    # 3. FETCH RAW DEPARTMENT DATA PAYLOAD VIA ADAPTER
+    # 3. FETCH RAW DEPARTMENT DATA PAYLOAD VIA RESILIENT ADAPTER LAYER
     try:
-        raw_payload = await adapter.fetch_department_data(
+        raw_payload = await resilience_manager.execute_resilient_call(
+            adapter=adapter,
             citizen_id=str(current_user.id),
             data_type=req.data_type,
             consent_token=req.consent_token
@@ -112,6 +116,9 @@ async def execute_data_exchange(
         canonical_dict = canonical_obj.model_dump()
     elif req.data_type == "DEGREE_VERIFICATION":
         canonical_obj = CanonicalDataMapper.transform_degree_verification(raw_payload)
+        canonical_dict = canonical_obj.model_dump()
+    elif req.data_type == "SKILL_CERTIFICATE":
+        canonical_obj = CanonicalDataMapper.transform_skill_certificate(raw_payload)
         canonical_dict = canonical_obj.model_dump()
     else:
         canonical_dict = raw_payload  # Direct passthrough fallback

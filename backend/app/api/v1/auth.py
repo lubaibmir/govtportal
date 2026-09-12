@@ -57,11 +57,22 @@ async def login(
         details={"email": user.email, "full_name": user.full_name}
     )
 
+    user_profile = UserProfileResponse(
+        id=user.id,
+        email=user.email,
+        full_name=user.full_name,
+        phone=user.phone,
+        role_id=user.role_id,
+        role=user.role_id,
+        department_id=user.department_id,
+        is_active=user.is_active
+    )
+
     return TokenResponse(
         access_token=access_token,
         token_type="bearer",
         expires_in=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
-        user=UserProfileResponse.model_validate(user)
+        user=user_profile
     )
 
 @router.get("/me", response_model=dict, summary="Get Current Authenticated User Profile")

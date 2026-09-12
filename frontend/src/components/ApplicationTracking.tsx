@@ -11,6 +11,7 @@ import {
   ChevronUp
 } from 'lucide-react';
 import { fetchTrackingDetails, ApplicationTrackingData } from '../services/eventService';
+import { SlaCountdownTimer } from './SlaCountdownTimer';
 
 interface ApplicationTrackingProps {
   initialAppNumber?: string;
@@ -92,31 +93,58 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
           )}
         </div>
 
-        <form onSubmit={(e) => { e.preventDefault(); handleSearch(); }} className="flex flex-col sm:flex-row gap-2">
-          <div className="relative flex-1">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
-            <input
-              type="text"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Enter Application Tracking Number (e.g. MH-2026-891024)..."
-              className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded text-sm text-slate-900 font-mono placeholder-slate-400 focus:outline-none focus:border-emerald-700 focus:bg-white"
-            />
+        <form onSubmit={(e) => { e.preventDefault(); handleSearch(); }} className="space-y-3">
+          <div className="flex flex-col sm:flex-row gap-2">
+            <div className="relative flex-1">
+              <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Enter Application Tracking Number (e.g. APP-2026-IND-00142)..."
+                className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded text-sm text-slate-900 font-mono placeholder-slate-400 focus:outline-none focus:border-emerald-700 focus:bg-white"
+              />
+            </div>
+            <button
+              type="submit"
+              disabled={loading}
+              className="bg-[#166534] hover:bg-[#15803D] text-white text-xs font-semibold px-4 py-2 rounded transition-colors flex items-center justify-center gap-1.5 shrink-0"
+            >
+              {loading ? (
+                <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <>
+                  <Search className="w-3.5 h-3.5" />
+                  <span>Search</span>
+                </>
+              )}
+            </button>
           </div>
-          <button
-            type="submit"
-            disabled={loading}
-            className="bg-[#166534] hover:bg-[#15803D] text-white text-xs font-semibold px-4 py-2 rounded transition-colors flex items-center justify-center gap-1.5 shrink-0"
-          >
-            {loading ? (
-              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-            ) : (
-              <>
-                <Search className="w-3.5 h-3.5" />
-                <span>Search</span>
-              </>
-            )}
-          </button>
+
+          {/* Quick Demo Pre-filled Test Pills */}
+          <div className="flex flex-wrap items-center gap-2 pt-1">
+            <span className="text-xs text-slate-500 font-medium">Quick Demo Samples:</span>
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery('APP-2026-IND-00142');
+                handleSearch('APP-2026-IND-00142');
+              }}
+              className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded text-xs font-mono font-semibold border border-emerald-200 transition flex items-center gap-1"
+            >
+              <span>🔍</span> APP-2026-IND-00142 (Business License)
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery('APP-2026-MSINS-00912');
+                handleSearch('APP-2026-MSINS-00912');
+              }}
+              className="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-800 rounded text-xs font-mono font-semibold border border-blue-200 transition flex items-center gap-1"
+            >
+              <span>🔍</span> APP-2026-MSINS-00912 (MSInS Seed Grant)
+            </button>
+          </div>
         </form>
       </div>
 
@@ -143,11 +171,16 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
                 </p>
               </div>
 
-              <div className="sm:text-right">
-                <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded border ${getStatusLabel(trackingData.status).cls}`}>
-                  {getStatusLabel(trackingData.status).text}
-                </span>
-                <p className="text-[11px] text-slate-500 mt-1">
+              <div className="sm:text-right space-y-1.5">
+                <div className="flex sm:justify-end">
+                  <span className={`inline-block text-xs font-semibold px-2.5 py-1 rounded border ${getStatusLabel(trackingData.status).cls}`}>
+                    {getStatusLabel(trackingData.status).text}
+                  </span>
+                </div>
+                <div className="flex sm:justify-end">
+                  <SlaCountdownTimer createdAt={trackingData.created_at} status={trackingData.status} />
+                </div>
+                <p className="text-[11px] text-slate-500">
                   Updated: {new Date(trackingData.updated_at).toLocaleString('en-IN')}
                 </p>
               </div>

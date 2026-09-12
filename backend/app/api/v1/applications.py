@@ -5,12 +5,14 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from typing import List, Optional
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy import select
+from sqlalchemy import select, func
 
 from app.core.db import get_db
 from app.core.security import get_current_user, require_roles
 from app.core.events import publish_event
 from app.core.audit import create_audit_log
+from app.core.workflow_engine import workflow_registry
+from app.core.notifications import send_notification
 from app.db.models import Application, ApplicationEvent, Department, Service, User
 from app.schemas.application import ApplicationCreate, ApplicationResponse, ApplicationTrackingResponse, TrackingEventItem
 
@@ -26,10 +28,10 @@ def generate_application_number() -> str:
     return f"MH-{year}-{rand_num}"
 
 VALID_TRANSITIONS = {
-    "SUBMITTED": ["IN_REVIEW", "REJECTED"],
-    "IN_REVIEW": ["APPROVED", "REJECTED"],
-    "APPROVED": [],
-    "REJECTED": []
+    "SUBMITTED": ["SUBMITTED", "IN_REVIEW", "REJECTED"],
+    "IN_REVIEW": ["IN_REVIEW", "APPROVED", "REJECTED", "SUBMITTED"],
+    "APPROVED": ["APPROVED", "REJECTED", "IN_REVIEW"],
+    "REJECTED": ["REJECTED", "IN_REVIEW", "APPROVED"]
 }
 
 @router.post("", response_model=ApplicationResponse, status_code=status.HTTP_201_CREATED, summary="Submit New Service Application")
@@ -68,15 +70,55 @@ async def create_application(
         metadata_info={"consent_ids": [str(c) for c in (app_in.consent_ids or [])]}
     )
     db.add(initial_event)
+
+    # Dynamic Workflow Orchestration: Evaluate active policy rules (e.g. MSME / MSInS Auto-Approval)
+    rule_match = workflow_registry.evaluate_application(
+        service_id=app_in.service_id,
+        app_data=app_in.application_data
+    )
+
+    if rule_match and rule_match.triggered:
+        new_app.status = rule_match.target_status
+        auto_event = ApplicationEvent(
+            application_id=new_app.id,
+            event_type="AUTO_APPROVED_BY_POLICY_RULE",
+            actor_name="MahaSetu Policy Engine",
+            description=rule_match.reason,
+            metadata_info={"rule_id": rule_match.rule_id, "rule_name": rule_match.rule_name}
+        )
+        db.add(auto_event)
+
+    # Send Notification to Citizen
+    if new_app.status == "APPROVED":
+        await send_notification(
+            db=db,
+            user_id=current_user.id,
+            title="Application Auto-Approved",
+            message=f"Application #{app_number} for {service.name} has been AUTO-APPROVED via multi-department verified data.",
+            channel="WHATSAPP",
+            category="STATUS_UPDATE",
+            metadata_info={"application_number": app_number, "status": "APPROVED"}
+        )
+    else:
+        await send_notification(
+            db=db,
+            user_id=current_user.id,
+            title="Application Submitted",
+            message=f"Application #{app_number} for {service.name} submitted successfully. Track status on MahaSetu.",
+            channel="SMS",
+            category="STATUS_UPDATE",
+            metadata_info={"application_number": app_number, "status": "SUBMITTED"}
+        )
+
     await db.commit()
     await db.refresh(new_app)
 
     # Publish event to Event Bus
     await publish_event(
-        event_type="APPLICATION_CREATED",
-        actor_name=current_user.full_name,
-        description=f"Application {app_number} submitted to department {app_in.department_id}.",
-        payload={"application_number": app_number, "citizen_id": str(current_user.id)}
+        event_type="APPLICATION_APPROVED" if new_app.status == "APPROVED" else "APPLICATION_CREATED",
+        actor_name="MahaSetu Policy Engine" if new_app.status == "APPROVED" else current_user.full_name,
+        description=f"Application {app_number} processed with status '{new_app.status}' for department {app_in.department_id}.",
+        payload={"application_number": app_number, "citizen_id": str(current_user.id), "status": new_app.status}
     )
 
     return new_app
@@ -161,7 +203,10 @@ async def update_application_status(
 
     # Record event
     event_type = f"APPLICATION_{payload.status}"
-    event_desc = f"Status changed from '{old_status}' to '{payload.status}' by {current_user.full_name}."
+    if old_status == payload.status:
+        event_desc = f"Status '{payload.status}' reaffirmed / updated with officer remarks by {current_user.full_name}."
+    else:
+        event_desc = f"Status changed from '{old_status}' to '{payload.status}' by {current_user.full_name}."
     if payload.remarks:
         event_desc += f" Remarks: {payload.remarks}"
 
@@ -188,6 +233,26 @@ async def update_application_status(
         }
     )
 
+    notif_title = "Application Approved & Issued" if payload.status == "APPROVED" else (
+        "Application Rejected - Right to Appeal" if payload.status == "REJECTED" else
+        f"Application Status: {payload.status}"
+    )
+    notif_msg = (
+        f"Application #{application_number} was marked REJECTED by {current_user.full_name}. Reason: '{payload.remarks or 'Documents or criteria not satisfied'}'. You may raise an RTS appeal / grievance on MahaSetu."
+        if payload.status == "REJECTED" else
+        f"Application #{application_number} updated to '{payload.status}'. Notes: {payload.remarks or 'None'}"
+    )
+
+    await send_notification(
+        db=db,
+        user_id=app_obj.citizen_id,
+        title=notif_title,
+        message=notif_msg,
+        channel="WHATSAPP" if payload.status == "APPROVED" else "SMS",
+        category="STATUS_UPDATE",
+        metadata_info={"application_number": application_number, "status": payload.status, "remarks": payload.remarks}
+    )
+
     await db.commit()
     await db.refresh(app_obj)
 
@@ -206,13 +271,14 @@ async def track_application(
     application_number: str,
     db: AsyncSession = Depends(get_db)
 ):
-    stmt_app = select(Application).where(Application.application_number == application_number)
+    cleaned_num = application_number.strip()
+    stmt_app = select(Application).where(func.lower(Application.application_number) == cleaned_num.lower())
     app_obj = (await db.execute(stmt_app)).scalar_one_or_none()
 
     if not app_obj:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Application '{application_number}' not found"
+            detail=f"Application '{cleaned_num}' not found"
         )
 
     # Resolve Service title

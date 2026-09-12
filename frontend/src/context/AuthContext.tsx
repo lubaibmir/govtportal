@@ -18,7 +18,16 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(() => {
     const savedUser = localStorage.getItem('mahasetu_user');
-    return savedUser ? JSON.parse(savedUser) : null;
+    if (!savedUser) return null;
+    try {
+      const parsed = JSON.parse(savedUser);
+      return {
+        ...parsed,
+        role: parsed.role || parsed.role_id || 'CITIZEN'
+      };
+    } catch {
+      return null;
+    }
   });
   const [token, setToken] = useState<string | null>(() => {
     return localStorage.getItem('mahasetu_token');
@@ -43,11 +52,16 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
 
     const data = await response.json();
+    const normalizedUser: User = {
+      ...data.user,
+      role: (data.user.role || data.user.role_id || 'CITIZEN') as any
+    };
+
     setToken(data.access_token);
-    setUser(data.user);
+    setUser(normalizedUser);
 
     localStorage.setItem('mahasetu_token', data.access_token);
-    localStorage.setItem('mahasetu_user', JSON.stringify(data.user));
+    localStorage.setItem('mahasetu_user', JSON.stringify(normalizedUser));
     setIsLoginOpen(false);
   };
 

@@ -9,6 +9,12 @@ from app.api.v1.data_requests import router as data_requests_router
 from app.api.v1.events import router as events_router
 from app.api.v1.audit import router as audit_router
 from app.api.v1.demo import router as demo_router
+from app.api.v1.resilience import router as resilience_router
+from app.api.v1.metrics import router as metrics_router
+from app.api.v1.grievances import router as grievances_router
+from app.api.v1.workflow_rules import router as workflow_rules_router
+from app.api.v1.notifications import router as notifications_router
+from app.api.v1.beneficiary import router as beneficiary_router
 
 api_router = APIRouter()
 api_router.include_router(health_router)
@@ -21,3 +27,9 @@ api_router.include_router(data_requests_router)
 api_router.include_router(events_router)
 api_router.include_router(audit_router)
 api_router.include_router(demo_router)
+api_router.include_router(resilience_router)
+api_router.include_router(metrics_router)
+api_router.include_router(grievances_router)
+api_router.include_router(workflow_rules_router)
+api_router.include_router(notifications_router)
+api_router.include_router(beneficiary_router)

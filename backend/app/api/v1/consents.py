@@ -131,6 +131,17 @@ async def approve_consent(
         }
     )
 
+    from app.core.notifications import send_notification
+    await send_notification(
+        db=db,
+        user_id=current_user.id,
+        title="Consent Approved (Token Issued)",
+        message=f"You approved secure cross-department access for {consent.requesting_department_id}. Token: {consent.consent_token[:18]}...",
+        channel="SMS",
+        category="CONSENT_REQUEST",
+        metadata_info={"consent_token": consent.consent_token, "providing_dept": consent.providing_department_id}
+    )
+
     await db.commit()
     await db.refresh(consent)
     return consent

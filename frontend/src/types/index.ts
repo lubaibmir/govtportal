@@ -16,6 +16,7 @@ export interface User {
   full_name: string;
   phone?: string;
   role: Role;
+  role_id?: Role;
   department_id?: string | null;
   citizen_profile?: CitizenProfileData | null;
 }

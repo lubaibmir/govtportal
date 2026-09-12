@@ -134,7 +134,15 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
               className="p-2 bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded text-left transition-colors"
             >
               <div className="font-bold text-slate-900">Rahul Sharma</div>
-              <div className="text-[10px] text-slate-500">Citizen</div>
+              <div className="text-[10px] text-slate-500">Citizen (Applicant)</div>
+            </button>
+
+            <button
+              onClick={() => handleQuickDemoLogin('officer.msins@example.gov.in')}
+              className="p-2 bg-slate-50 hover:bg-emerald-50 border border-emerald-300 bg-emerald-50/50 rounded text-left transition-colors"
+            >
+              <div className="font-bold text-emerald-900">Officer MSInS</div>
+              <div className="text-[10px] text-emerald-700">Skills & Innovation</div>
             </button>
 
             <button
@@ -143,14 +151,6 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             >
               <div className="font-bold text-slate-900">Officer Industries</div>
               <div className="text-[10px] text-slate-500">Nodal Officer</div>
-            </button>
-
-            <button
-              onClick={() => handleQuickDemoLogin('officer.revenue@example.gov.in')}
-              className="p-2 bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded text-left transition-colors"
-            >
-              <div className="font-bold text-slate-900">Officer Revenue</div>
-              <div className="text-[10px] text-slate-500">Tehsildar</div>
             </button>
 
             <button

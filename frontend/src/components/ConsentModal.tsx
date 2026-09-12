@@ -6,6 +6,7 @@ import { createConsent, approveConsent } from '../services/consentService';
 interface ConsentModalProps {
   isOpen: boolean;
   onClose: () => void;
+  serviceId?: string;
   serviceName: string;
   requestingDept: string;
   providingDept: string;
@@ -18,6 +19,7 @@ interface ConsentModalProps {
 export const ConsentModal: React.FC<ConsentModalProps> = ({
   isOpen,
   onClose,
+  serviceId = 'srv_ind_biz_license',
   serviceName,
   requestingDept,
   providingDept,
@@ -40,7 +42,7 @@ export const ConsentModal: React.FC<ConsentModalProps> = ({
       const consentReq = await createConsent({
         requesting_department_id: requestingDept,
         providing_department_id: providingDept,
-        service_id: 'srv_ind_biz_license',
+        service_id: serviceId,
         purpose: purpose,
         requested_fields: requestedFields,
         valid_duration_hours: 24

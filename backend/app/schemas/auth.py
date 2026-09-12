@@ -12,6 +12,7 @@ class UserProfileResponse(BaseModel):
     full_name: str
     phone: str
     role_id: str
+    role: Optional[str] = None
     department_id: Optional[str] = None
     is_active: bool
 

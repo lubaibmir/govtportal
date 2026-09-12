@@ -169,3 +169,36 @@ class AuditLog(Base):
     result = Column(String(20), nullable=False)
     ip_address = Column(String(45), nullable=False)
     details = Column(JSON, nullable=True)
+
+class Grievance(Base):
+    __tablename__ = "grievances"
+
+    id = Column(GUID(), primary_key=True, default=uuid.uuid4)
+    grievance_number = Column(String(32), unique=True, nullable=False, index=True)
+    application_id = Column(GUID(), ForeignKey("applications.id"), nullable=True)
+    application_number = Column(String(32), nullable=True)
+    citizen_id = Column(GUID(), ForeignKey("users.id"), nullable=False)
+    citizen_name = Column(String(128), nullable=False)
+    department_id = Column(String(64), ForeignKey("departments.id"), nullable=False)
+    category = Column(String(64), nullable=False)
+    description = Column(Text, nullable=False)
+    status = Column(String(32), default="OPEN")  # OPEN, IN_PROGRESS, RESOLVED
+    resolution_notes = Column(Text, nullable=True)
+    escalated = Column(Boolean, default=False)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
+    resolved_at = Column(DateTime(timezone=True), nullable=True)
+
+class Notification(Base):
+    __tablename__ = "notifications"
+
+    id = Column(GUID(), primary_key=True, default=uuid.uuid4)
+    user_id = Column(GUID(), ForeignKey("users.id"), nullable=False, index=True)
+    title = Column(String(128), nullable=False)
+    message = Column(Text, nullable=False)
+    channel = Column(String(32), default="SMS")  # SMS, WHATSAPP, EMAIL, IN_APP
+    category = Column(String(64), default="STATUS_UPDATE")  # CONSENT_REQUEST, DATA_VERIFIED, STATUS_UPDATE, GRIEVANCE_UPDATE
+    is_read = Column(Boolean, default=False)
+    metadata_info = Column("metadata", JSON, nullable=True)
+    created_at = Column(DateTime(timezone=True), default=utc_now)
+
+
