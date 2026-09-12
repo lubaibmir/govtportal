@@ -33,6 +33,7 @@ export const CitizenDashboard: React.FC = () => {
   const [trackingAppNumber, setTrackingAppNumber] = useState<string>('');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Modal states
   const [isConsentOpen, setIsConsentOpen] = useState(false);
@@ -65,16 +66,23 @@ export const CitizenDashboard: React.FC = () => {
   const handleConsentGranted = async (consentToken: string, consentId: string) => {
     if (!token) return;
     setIsSubmitting(true);
+    setErrorMsg(null);
     setSuccessMsg(null);
+
     try {
-      const exchangeResult = await executeDataExchange({
-        consent_token: consentToken,
-        providing_department_id: 'dept_revenue',
-        data_type: 'INCOME_CERTIFICATE'
-      }, token);
+      // Step 1: Federated Interoperability Call to Revenue Dept via Canonical Mapper
+      const exchangeResult = await executeDataExchange(
+        {
+          consent_token: consentToken,
+          providing_department_id: 'dept_revenue',
+          data_type: 'INCOME_CERTIFICATE'
+        },
+        token
+      );
 
       const canonicalIncome = exchangeResult.canonical_payload;
 
+      // Step 2: Submit Application with Canonical Verified Payload
       const res = await submitApplication(
         {
           service_id: 'srv_ind_biz_license',
@@ -99,14 +107,14 @@ export const CitizenDashboard: React.FC = () => {
       await loadApps();
       setActiveTab('MY_APPS');
     } catch (err: any) {
-      alert(err.message || 'Interoperability application submission failed');
+      setErrorMsg(err.message || 'Interoperability application submission failed.');
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleConsentDenied = () => {
-    alert('Consent was denied. Application cannot proceed without verified departmental data.');
+    setErrorMsg('Citizen consent was declined. Cross-department application cannot proceed without verified departmental data authorization.');
   };
 
   const getStatusDisplay = (status: string) => {
@@ -277,9 +285,24 @@ export const CitizenDashboard: React.FC = () => {
       </div>
 
       {successMsg && (
-        <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 p-3.5 rounded text-xs flex items-center gap-2">
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 p-3.5 rounded text-xs flex items-center gap-2 animate-fadeIn">
           <CheckCircle2 className="w-4 h-4 text-emerald-700 shrink-0" />
           <span>{successMsg}</span>
+        </div>
+      )}
+
+      {errorMsg && (
+        <div className="bg-red-50 border border-red-200 text-red-900 p-3.5 rounded text-xs flex items-center justify-between gap-2 animate-fadeIn">
+          <div className="flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-red-700 shrink-0" />
+            <span>{errorMsg}</span>
+          </div>
+          <button 
+            onClick={() => setErrorMsg(null)}
+            className="text-red-700 hover:text-red-900 font-bold ml-2 cursor-pointer"
+          >
+            ✕
+          </button>
         </div>
       )}
 

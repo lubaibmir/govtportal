@@ -288,4 +288,168 @@ cd d:\govtportal\backend
 # 2. Verify clean production frontend build
 cd d:\govtportal\frontend
 npm run build
+
+# 3. Test Brevo live email dispatch directly to your inbox
+cd d:\govtportal\backend
+.\venv\Scripts\python.exe test_brevo.py your_email@domain.com
 ```
+
+---
+
+## 🆕 New Additions, Feature Descriptions & Live Verification Guide
+
+This section details all recent production-grade enhancements added to MahaSetu, their statutory architectural rationale, and exact step-by-step instructions on how to use and manually verify each feature.
+
+---
+
+### 1. 📧 Brevo (Sendinblue) Transactional Email Dispatcher
+
+#### 📌 Description & Rationale
+In real-world e-governance (under the Maharashtra RTS Act 2015), citizens must receive real-time, legally binding digital notifications whenever:
+- A new application is submitted with interoperable consent.
+- An application is Auto-Approved by the policy engine or Approved by an Officer.
+- An application is Rejected with statutory grounds of rejection.
+- A grievance is registered or escalated due to SLA breach.
+
+We have integrated Brevo’s HTTP API v3 (`https://api.brevo.com/v3/smtp/email`) in `backend/app/core/notifications.py`. If a `BREVO_API_KEY` is configured in `backend/.env`, official HTML-styled emails (complete with government insignia, badge, message box, and digital seal notice) are dispatched directly to the citizen's inbox. If the API key is omitted, it automatically falls back to an internal simulation logger without crashing.
+
+#### ⚙️ Configuration in `backend/.env`
+Ensure your `backend/.env` contains your Brevo API key and verified sender email:
+```env
+# Brevo (Sendinblue) Transactional Email API
+BREVO_API_KEY=xkeysib-YOUR_ACTUAL_BREVO_API_KEY_HERE
+BREVO_SENDER_EMAIL=your_verified_sender@domain.com
+BREVO_SENDER_NAME=MahaSetu Portal
+```
+
+#### 🧪 How to Manually Test & Verify Brevo Email
+
+##### Method A: Instant Direct Terminal Test (Recommended for Evaluators)
+Run the dedicated test script from the backend directory to send an immediate verification email to any inbox:
+```powershell
+cd d:\govtportal\backend
+.\venv\Scripts\python.exe test_brevo.py your_personal_email@domain.com
+```
+**Expected Output:**
+```
+=====================================================
+ 🏛️ MahaSetu — Brevo Email Live Dispatch Verification
+=====================================================
+📡 Brevo API Key: xkeysib-... (Configured)
+📤 Sender Email: your_verified_sender@domain.com
+📤 Sender Name:  MahaSetu Portal
+📥 Recipient:    your_personal_email@domain.com
+-----------------------------------------------------
+[BREVO EMAIL SUCCESS] Dispatched to your_personal_email@domain.com (Msg ID: <...>)
+
+✅ SUCCESS: Brevo email dispatched successfully! Please check your inbox / spam folder.
+```
+
+##### Method B: In-Portal Citizen Workflow Trigger
+1. Ensure `backend/.env` has your valid Brevo API key and sender.
+2. In the portal header, switch to **Citizen Rahul Sharma**.
+3. Apply for **MSInS Startup Innovation Seed Grant** (or any other service).
+4. Inspect the backend terminal console:
+   - You will see: `[BREVO EMAIL SUCCESS] Dispatched to rahul.sharma@example.gov.in (Msg ID: ...)`
+   *(Tip: To receive it in your own mailbox during UI testing, update Rahul Sharma's email in the database or run Method A).*
+
+---
+
+### 2. 🌐 Contextual Administrative Marathi Localization (`i18n`)
+
+#### 📌 Description & Rationale
+Government portals often suffer from clumsy literal translations (e.g. translating "Audit Logs" literally as "wooden logs" / *लाकडी नोंदी*). 
+MahaSetu features a comprehensive, contextually accurate administrative Marathi translation dictionary (`frontend/src/i18n/translations.ts`) grounded in official Government of Maharashtra (*शासन निर्णय*) vocabulary:
+- **Audit Logs** ➔ *लेखापरीक्षण नोंदवही / अहवाल* (Official audit register)
+- **Consent Center** ➔ *नागरिक संमती व्यवस्थापन केंद्र* (Citizen consent governance)
+- **Application Tracking** ➔ *अर्ज स्थिती व ट्रॅकिंग*
+- **Grievance Redressal** ➔ *तक्रार निवारण प्रणाली*
+- **SLA Clock** ➔ *महाराष्ट्र लोकसेवा हक्क अधिनियम कालावधी (२१ दिवस)*
+- **In Review / Scrutiny** ➔ *छाननी / पुनरावलोकन प्रक्रियेत*
+- **Auto-Approved** ➔ *धोरण नियमानुसार स्वयंचलित मंजूर*
+
+#### 🧪 How to Use & Verify
+1. Look at the top navigation bar and locate the **Language Switcher** toggle (`मराठी / English`).
+2. Click **"मराठी"**:
+   - The entire dashboard immediately switches to authentic Marathi administrative phrasing.
+   - Switch between **Citizen**, **Officer**, and **Admin** personas:
+     - Notice the Officer Scrutiny queue shows *छाननी व निर्णय*, *अर्जदार तपशील*, *वार्षिक उत्पन्न पडताळणी*.
+     - Notice the Admin Audit explorer shows *लेखापरीक्षण नोंदवही*.
+3. Click **"English"** to seamlessly return to English at any time.
+
+---
+
+### 3. 📋 Human-Readable Form Particulars in Officer Inspection View
+
+#### 📌 Description & Rationale
+In real administrative workflows, verifying officers should never have to read unformatted raw JSON code. 
+In `frontend/src/components/OfficerDashboard.tsx`, the inspection modal now renders clean, high-density GovTech Particulars Cards:
+- **Applicant & Identity Details:** Formatted applicant name, Aadhaar token hash, DigiLocker credentials.
+- **Enterprise & Project Particulars:** Startup name, sector, incubator affiliation, and project description.
+- **Revenue Interoperability:** Verified revenue certificate number, verified annual income (formatted in ₹ Indian currency notation `₹4,50,000`), issuing Tehsildar office.
+- **Technical Qualification:** Pre-verified MSBTE technical diploma certificate, board of examination, year of passing.
+
+#### 🧪 How to Use & Verify
+1. Switch to **Officer Rajesh Deshmukh (MSInS)** from the top persona dropdown.
+2. In the officer queue, click **"Inspect & Process"** on any application (e.g., `APP-2026-IND-00142`).
+3. **Observe:**
+   - Instead of a raw JSON blob, you see structured cards:
+     - 🏢 *Enterprise Particulars Card*
+     - 💼 *Verified Financials & Income Card*
+     - 🎓 *Education & Skill Interoperability Card*
+4. Click **"Approve & Issue Certificate"** or **"Reject Application"**:
+   - The modal automatically closes, displays a status banner, and removes the processed application from the pending queue.
+
+---
+
+### 4. 🔕 Elimination of Browser `alert()` & `confirm()` Popups
+
+#### 📌 Description & Rationale
+Native browser `alert()` and `confirm()` popups break accessibility, freeze single-page applications, and look unprofessional. All popups across MahaSetu have been replaced with self-contained, accessible GovTech UI components:
+- **Certificate Downloads:** Replaced `alert()` with an authenticated digital seal confirmation banner.
+- **Statutory Rule Resets:** Replaced `window.confirm()` with an inline two-step confirmation widget (`Yes, Reset` / `Cancel`).
+- **Consent Revocation:** Custom modal with clear amber warning state explaining data token invalidation.
+- **Outage Simulations:** Inline error/status feedback cards.
+
+#### 🧪 How to Use & Verify
+1. In Citizen Dashboard, navigate to **"Track Application"** and search `APP-2026-IND-00142`.
+2. Click **"Download Certificate"**:
+   - **Observe:** No browser popup appears. A verified green banner displays: *"Official Certificate generated & verified. Digitally signed via Maharashtra State Portal Cryptographic Key."*
+3. Switch to **Admin Nitin Patil** ➔ Go to **"Workflow Rules Engine"** ➔ Click **"Reset Defaults"**:
+   - **Observe:** An inline amber confirmation appears directly on screen with `Yes, Reset` and `Cancel` buttons.
+
+---
+
+### 5. ⚡ Interactive Policy Rule Simulation Sandbox
+
+#### 📌 Description & Rationale
+Demonstrates how Maharashtra RTS Act 2015 business rules evaluate incoming payloads dynamically without hardcoded logic.
+
+#### 🧪 How to Use & Verify
+1. In **Admin Dashboard**, click the **"Workflow Rules"** tab.
+2. Scroll to the **"Interactive Rule Simulation & Verification Sandbox"**.
+3. Select **Service**: `MSInS Startup Innovation Seed Grant`.
+4. Click the **`₹4.2L`** income button and select **Grade**: `Distinction (MSBTE Level 6)`.
+5. Click **"🚀 Run Rule Simulation"**:
+   - **Observe Decision:** `✅ POLICY DECISION: AUTO-APPROVED (Bypasses Manual Queue)`.
+   - Displays execution speed: `⚡ Execution Time: ~12ms`.
+6. Change the income to **`₹12L`** and click **"🚀 Run Rule Simulation"**:
+   - **Observe Decision:** `⏳ POLICY DECISION: ROUTED TO MANUAL OFFICER SCRUTINY` (Criteria exceeded auto-approval cap).
+
+---
+
+### 6. 🛡️ Upstream Outage Simulation & Zero-Crash Resilience
+
+#### 📌 Description & Rationale
+If the Revenue Department or MSBTE database goes offline in production, citizen applications must **never** crash or return HTTP 500 errors. 
+MahaSetu implements the *Once-Only Principle (OOP)* with a 3-state Circuit Breaker, 3x exponential backoff retry, and an encrypted local cache token fallback.
+
+#### 🧪 How to Use & Verify
+1. In **Admin Dashboard** ➔ Go to **"System Health & Resilience"**.
+2. Under **"Live Resilience Simulator"**, select `Revenue Department (Mahabhulekh / e-Revenue)` and click **"Simulate API Outage"**.
+3. **Observe:** The Revenue Department status changes to **🔴 OFFLINE**.
+4. Switch to **Citizen Rahul Sharma** and submit a new application requiring Revenue data:
+   - **Result:** The application succeeds without error.
+   - The system utilizes the pre-verified consent cache token (`cnt_token_...`), allowing uninterrupted governance delivery.
+5. Return to Admin and click **"Restore Service"** to bring the department back to **🟢 HEALTHY**.
+

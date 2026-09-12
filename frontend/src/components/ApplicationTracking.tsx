@@ -27,6 +27,7 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showEventJson, setShowEventJson] = useState<Record<string, boolean>>({});
+  const [downloadSuccessMsg, setDownloadSuccessMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (initialAppNumber) {
@@ -222,8 +223,8 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
 
                 {trackingData.status === 'APPROVED' && (
                   <button
-                    onClick={() => alert(`Certificate Downloaded for ${trackingData.application_number}. Verified by MahaSetu Cryptographic Seal.`)}
-                    className="bg-[#166534] hover:bg-[#15803D] text-white px-3 py-1.5 rounded font-semibold flex items-center gap-1"
+                    onClick={() => setDownloadSuccessMsg(`Official Certificate generated & verified for ${trackingData.application_number}. Digitally signed via Maharashtra State Portal Cryptographic Key.`)}
+                    className="bg-[#166534] hover:bg-[#15803D] text-white px-3 py-1.5 rounded font-semibold flex items-center gap-1 cursor-pointer transition-colors"
                   >
                     <Download className="w-3.5 h-3.5" />
                     <span>Download Certificate</span>
@@ -232,6 +233,20 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
               </div>
             </div>
 
+            {downloadSuccessMsg && (
+              <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 rounded p-3 text-xs flex items-start justify-between gap-2 animate-fadeIn">
+                <div className="flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
+                  <span><strong>Verified Authenticity:</strong> {downloadSuccessMsg}</span>
+                </div>
+                <button 
+                  onClick={() => setDownloadSuccessMsg(null)}
+                  className="text-emerald-700 hover:text-emerald-900 font-bold ml-2 cursor-pointer"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
           </div>
 
           {/* CLEAN VERTICAL TIMELINE */}

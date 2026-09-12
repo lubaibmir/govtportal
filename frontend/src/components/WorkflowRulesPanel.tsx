@@ -31,6 +31,7 @@ export const WorkflowRulesPanel: React.FC = () => {
   const [simService, setSimService] = useState<'srv_msins_seed_grant' | 'srv_ind_biz_license'>('srv_msins_seed_grant');
   const [simIncome, setSimIncome] = useState<number>(420000);
   const [simGrade, setSimGrade] = useState<string>('DISTINCTION');
+  const [showResetConfirm, setShowResetConfirm] = useState<boolean>(false);
   const [simResult, setSimResult] = useState<{
     triggered: boolean;
     ruleName: string;
@@ -109,12 +110,11 @@ export const WorkflowRulesPanel: React.FC = () => {
 
   const handleResetDefaults = async () => {
     if (!token) return;
-    if (!window.confirm('Reset all workflow orchestration rules to statutory Maharashtra RTS defaults?')) return;
-
+    setShowResetConfirm(false);
     setLoading(true);
     try {
       await resetWorkflowRules(token);
-      setFeedbackMsg({ text: 'All policy rules restored to government defaults.', type: 'success' });
+      setFeedbackMsg({ text: 'All policy rules restored to statutory Maharashtra RTS defaults.', type: 'success' });
       await loadRules();
     } catch (err: any) {
       setFeedbackMsg({ text: err.message || 'Failed to reset rules', type: 'error' });
@@ -219,13 +219,31 @@ export const WorkflowRulesPanel: React.FC = () => {
           >
             <RefreshCw className="w-4 h-4" />
           </button>
-          <button
-            onClick={handleResetDefaults}
-            className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-semibold border border-slate-300 flex items-center gap-1.5 transition-colors"
-          >
-            <RotateCcw className="w-3.5 h-3.5" />
-            <span>Reset Defaults</span>
-          </button>
+          {!showResetConfirm ? (
+            <button
+              onClick={() => setShowResetConfirm(true)}
+              className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 rounded text-xs font-semibold border border-slate-300 flex items-center gap-1.5 transition-colors cursor-pointer"
+            >
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Reset Defaults</span>
+            </button>
+          ) : (
+            <div className="flex items-center gap-1.5 bg-amber-50 border border-amber-300 rounded px-2.5 py-1 text-xs animate-fadeIn">
+              <span className="font-semibold text-amber-900">Reset rules to RTS statutory defaults?</span>
+              <button
+                onClick={handleResetDefaults}
+                className="bg-amber-600 hover:bg-amber-700 text-white font-bold px-2 py-0.5 rounded text-[11px] transition-colors cursor-pointer"
+              >
+                Yes, Reset
+              </button>
+              <button
+                onClick={() => setShowResetConfirm(false)}
+                className="bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 px-2 py-0.5 rounded text-[11px] transition-colors cursor-pointer"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
         </div>
       </div>
 

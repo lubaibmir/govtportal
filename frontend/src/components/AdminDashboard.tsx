@@ -75,7 +75,7 @@ export const AdminDashboard: React.FC = () => {
           : `Restored ${selectedOutageDept} to healthy status. Pending queue resumed.`
       );
     } catch (err: any) {
-      alert(err.message || 'Failed to toggle outage simulation');
+      setOutageFeedback(err.message || 'Failed to toggle outage simulation. Please verify network connectivity.');
     } finally {
       setOutageActionLoading(false);
     }

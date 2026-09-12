@@ -1,6 +1,6 @@
 import os
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from typing import List
+from typing import List, Optional
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "MahaSetu - Unified Interoperability Platform"
@@ -30,6 +30,11 @@ class Settings(BaseSettings):
         "http://127.0.0.1:5173",
         "http://localhost:8000"
     ]
+
+    # Brevo Transactional Email Configuration
+    BREVO_API_KEY: Optional[str] = None
+    BREVO_SENDER_EMAIL: str = "noreply@mahasetu.gov.in"
+    BREVO_SENDER_NAME: str = "MahaSetu (Govt of Maharashtra)"
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 

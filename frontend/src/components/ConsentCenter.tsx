@@ -8,6 +8,8 @@ export const ConsentCenter: React.FC = () => {
   const [consents, setConsents] = useState<ConsentRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [revokingId, setRevokingId] = useState<string | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [successMsg, setSuccessMsg] = useState<string | null>(null);
 
   useEffect(() => {
     if (token) loadConsents();
@@ -24,11 +26,14 @@ export const ConsentCenter: React.FC = () => {
   const handleRevoke = async (consentId: string) => {
     if (!token) return;
     setRevokingId(consentId);
+    setErrorMsg(null);
+    setSuccessMsg(null);
     try {
       await revokeConsent(consentId, token);
+      setSuccessMsg('Digital consent revoked successfully. Further departmental data access has been cryptographically blocked.');
       await loadConsents();
     } catch (err: any) {
-      alert(err.message || 'Failed to revoke consent');
+      setErrorMsg(err.message || 'Failed to revoke consent.');
     } finally {
       setRevokingId(null);
     }
@@ -50,6 +55,20 @@ export const ConsentCenter: React.FC = () => {
   return (
     <div className="space-y-6">
       
+      {/* Notifications */}
+      {errorMsg && (
+        <div className="bg-red-50 border border-red-200 text-red-900 p-3.5 rounded text-xs flex items-center justify-between">
+          <span>{errorMsg}</span>
+          <button onClick={() => setErrorMsg(null)} className="text-red-700 font-bold ml-2">✕</button>
+        </div>
+      )}
+      {successMsg && (
+        <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 p-3.5 rounded text-xs flex items-center justify-between">
+          <span>{successMsg}</span>
+          <button onClick={() => setSuccessMsg(null)} className="text-emerald-700 font-bold ml-2">✕</button>
+        </div>
+      )}
+
       {/* Header */}
       <div className="bg-white border border-[#E5E7E3] rounded-md p-5 shadow-xs flex items-center justify-between">
         <div>

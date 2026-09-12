@@ -417,12 +417,68 @@ export const OfficerDashboard: React.FC = () => {
               </div>
             )}
 
-            {/* FORM DATA DETAILS */}
-            <div>
-              <h4 className="text-xs font-bold text-slate-900 mb-1">Submitted Form Data</h4>
-              <pre className="p-3 bg-slate-900 text-slate-100 rounded text-[11px] font-mono overflow-x-auto">
-                {JSON.stringify(selectedApp.application_data, null, 2)}
-              </pre>
+            {/* HUMAN-READABLE SUBMITTED APPLICATION DETAILS */}
+            <div className="bg-slate-50 border border-slate-200 rounded p-4 space-y-3">
+              <div className="flex items-center justify-between border-b border-slate-200 pb-2">
+                <h4 className="text-xs font-bold text-slate-900 uppercase tracking-wider flex items-center gap-1.5">
+                  <FileText className="w-3.5 h-3.5 text-slate-700" />
+                  <span>Applicant Submitted Particulars</span>
+                </h4>
+                <span className="text-[10px] text-slate-500 font-mono">
+                  {selectedApp.application_data?.auto_fetched_via_consent ? 'Consent-Federated Submission' : 'Direct Submission'}
+                </span>
+              </div>
+
+              {/* General Project / Business Profile */}
+              <div className="grid sm:grid-cols-2 gap-3 text-xs">
+                {selectedApp.application_data?.startup_name && (
+                  <div>
+                    <span className="text-slate-500 block text-[11px]">Startup / Enterprise Name:</span>
+                    <strong className="text-slate-900 text-xs">{selectedApp.application_data.startup_name}</strong>
+                  </div>
+                )}
+                {selectedApp.application_data?.enterprise && (
+                  <div>
+                    <span className="text-slate-500 block text-[11px]">Enterprise Name:</span>
+                    <strong className="text-slate-900 text-xs">{selectedApp.application_data.enterprise}</strong>
+                  </div>
+                )}
+                {selectedApp.application_data?.applicant_name && (
+                  <div>
+                    <span className="text-slate-500 block text-[11px]">Applicant Founder:</span>
+                    <strong className="text-slate-900 text-xs">{selectedApp.application_data.applicant_name}</strong>
+                  </div>
+                )}
+                {selectedApp.application_data?.sector && (
+                  <div>
+                    <span className="text-slate-500 block text-[11px]">Innovation Sector:</span>
+                    <span className="text-slate-800 font-semibold">{selectedApp.application_data.sector}</span>
+                  </div>
+                )}
+                {selectedApp.application_data?.funding_requested && (
+                  <div>
+                    <span className="text-slate-500 block text-[11px]">Grant Funding Requested:</span>
+                    <strong className="text-emerald-900 font-mono text-sm">
+                      ₹{Number(selectedApp.application_data.funding_requested).toLocaleString('en-IN')}
+                    </strong>
+                  </div>
+                )}
+                {selectedApp.application_data?.preferred_incubator && (
+                  <div>
+                    <span className="text-slate-500 block text-[11px]">Preferred Incubator Partner:</span>
+                    <span className="text-slate-800 font-medium">{selectedApp.application_data.preferred_incubator}</span>
+                  </div>
+                )}
+              </div>
+
+              {selectedApp.application_data?.project_description && (
+                <div className="pt-2 border-t border-slate-200 text-xs">
+                  <span className="text-slate-500 block text-[11px] mb-0.5">Project Scope & Technical Summary:</span>
+                  <p className="text-slate-800 bg-white border border-slate-200 p-2.5 rounded leading-relaxed text-[11px]">
+                    {selectedApp.application_data.project_description}
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* DECISION FORM */}
