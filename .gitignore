@@ -1,0 +1,37 @@
+# Dependencies
+node_modules/
+frontend/node_modules/
+venv/
+backend/venv/
+.venv/
+
+# Build and Output
+dist/
+frontend/dist/
+build/
+*.egg-info/
+
+# Python Cache & Testing
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+backend/.pytest_cache/
+
+# Databases & SQLite
+*.db
+*.sqlite3
+mahasetu.db
+backend/mahasetu.db
+
+# Environment Variables & Secrets
+.env
+.env.local
+.env.*.local
+!.env.example
+
+# IDE & OS Files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
