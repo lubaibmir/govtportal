@@ -93,21 +93,7 @@ export const Navbar: React.FC = () => {
               </div>
             </div>
 
-            {/* Navigation Links */}
-            <nav className="hidden md:flex items-center space-x-6 text-sm font-medium text-slate-700">
-              <a href="#catalogue" className="hover:text-emerald-800 transition-colors">
-                {t('nav_services', 'Services')}
-              </a>
-              <a href="#track" className="hover:text-emerald-800 transition-colors">
-                {t('nav_track', 'Track Application')}
-              </a>
-              <a href="#consents" className="hover:text-emerald-800 transition-colors">
-                {t('nav_consents', 'Consent Center')}
-              </a>
-              <a href="#architecture" className="hover:text-emerald-800 transition-colors">
-                {t('nav_architecture', 'Architecture')}
-              </a>
-            </nav>
+
 
             {/* Language Selector + Authentication & User Controls */}
             <div className="flex items-center space-x-3">
