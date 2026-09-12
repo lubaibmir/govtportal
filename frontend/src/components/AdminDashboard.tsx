@@ -6,11 +6,12 @@ import {
   Database, 
   Lock, 
   CheckCircle2, 
-  ArrowRight,
-  RefreshCw,
-  Search
+  ArrowRight, 
+  RefreshCw, 
+  Search 
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { fetchUserApplications, ApplicationRecord } from '../services/applicationService';
 import { fetchHealthStatus } from '../services/api';
 import { HealthStatus } from '../types';
@@ -26,6 +27,7 @@ import { AlertTriangle, WifiOff, CheckCircle, Cpu, ShieldAlert, Sliders } from '
 
 export const AdminDashboard: React.FC = () => {
   const { user, token } = useAuth();
+  const { language, t, tNum, tDate } = useLanguage();
   const [applications, setApplications] = useState<ApplicationRecord[]>([]);
   const [health, setHealth] = useState<HealthStatus | null>(null);
   const [loading, setLoading] = useState(true);
@@ -104,14 +106,14 @@ export const AdminDashboard: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-bold text-slate-900">
-              State System Administration
+              {t('admin_system_title')}
             </h1>
             <span className="text-[11px] font-semibold text-[#166534] bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
-              Platform Admin
+              {language === 'mr' ? 'मुख्य प्रशासक' : 'Platform Admin'}
             </span>
           </div>
           <p className="text-xs text-slate-600 mt-1">
-            Administrator: <strong>{user?.full_name}</strong> • Platform metrics, interoperability traffic, service registry, and security audit stream.
+            {language === 'mr' ? 'प्रशासक:' : 'Administrator:'} <strong>{user?.full_name}</strong> • {language === 'mr' ? 'प्रणाली मेट्रिक्स, आंतर-विभागीय ट्रॅफिक, सेवा नोंदवही आणि सुरक्षा ऑडिट प्रवाह.' : 'Platform metrics, interoperability traffic, service registry, and security audit stream.'}
           </p>
         </div>
 
@@ -125,7 +127,7 @@ export const AdminDashboard: React.FC = () => {
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300'
             }`}
           >
-            Overview
+            {t('tab_overview')}
           </button>
 
           <button
@@ -136,7 +138,7 @@ export const AdminDashboard: React.FC = () => {
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300'
             }`}
           >
-            Applications ({totalApps})
+            {language === 'mr' ? `सर्व अर्ज (${tNum(totalApps)})` : `Applications (${totalApps})`}
           </button>
 
           <button
@@ -147,7 +149,7 @@ export const AdminDashboard: React.FC = () => {
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300'
             }`}
           >
-            Traffic Matrix
+            {language === 'mr' ? 'ट्रॅफिक मॅट्रिक्स' : 'Traffic Matrix'}
           </button>
 
           <button
@@ -158,7 +160,7 @@ export const AdminDashboard: React.FC = () => {
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300'
             }`}
           >
-            Services
+            {t('nav_services')}
           </button>
 
           <button
@@ -169,7 +171,7 @@ export const AdminDashboard: React.FC = () => {
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300'
             }`}
           >
-            Audit Logs
+            {t('tab_audit_ledger')}
           </button>
 
           <button
@@ -181,7 +183,7 @@ export const AdminDashboard: React.FC = () => {
             }`}
           >
             <ShieldAlert className="w-3.5 h-3.5" />
-            <span>RTS Grievances</span>
+            <span>{t('tab_officer_grievances')}</span>
           </button>
 
           <button
@@ -193,7 +195,7 @@ export const AdminDashboard: React.FC = () => {
             }`}
           >
             <Sliders className="w-3.5 h-3.5" />
-            <span>Workflow Rules & SLA</span>
+            <span>{t('tab_workflow_rules')}</span>
           </button>
 
           <button
@@ -205,10 +207,11 @@ export const AdminDashboard: React.FC = () => {
             }`}
           >
             <span>🔍</span>
-            <span>MDM Deduplication & 360°</span>
+            <span>{t('tab_mdm_dedup')}</span>
           </button>
         </div>
       </div>
+
 
       {/* OVERVIEW TAB */}
       {activeTab === 'OVERVIEW' && (
@@ -221,32 +224,32 @@ export const AdminDashboard: React.FC = () => {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="bg-white border border-[#E5E7E3] rounded-md p-4 flex items-center justify-between">
               <div>
-                <div className="text-[11px] font-semibold text-slate-500 uppercase">Total Applications</div>
-                <div className="text-2xl font-bold text-slate-900 mt-0.5">{totalApps}</div>
+                <div className="text-[11px] font-semibold text-slate-500 uppercase">{language === 'mr' ? 'एकूण अर्ज' : 'Total Applications'}</div>
+                <div className="text-2xl font-bold text-slate-900 mt-0.5">{tNum(totalApps)}</div>
               </div>
               <FileText className="w-5 h-5 text-slate-400" />
             </div>
 
             <div className="bg-white border border-[#E5E7E3] rounded-md p-4 flex items-center justify-between">
               <div>
-                <div className="text-[11px] font-semibold text-slate-500 uppercase">Approved Licenses</div>
-                <div className="text-2xl font-bold text-slate-900 mt-0.5">{approvedCount}</div>
+                <div className="text-[11px] font-semibold text-slate-500 uppercase">{language === 'mr' ? 'मंजूर परवाने' : 'Approved Licenses'}</div>
+                <div className="text-2xl font-bold text-slate-900 mt-0.5">{tNum(approvedCount)}</div>
               </div>
               <CheckCircle2 className="w-5 h-5 text-[#166534]" />
             </div>
 
             <div className="bg-white border border-[#E5E7E3] rounded-md p-4 flex items-center justify-between">
               <div>
-                <div className="text-[11px] font-semibold text-slate-500 uppercase">Under Review</div>
-                <div className="text-2xl font-bold text-slate-900 mt-0.5">{inReviewCount}</div>
+                <div className="text-[11px] font-semibold text-slate-500 uppercase">{language === 'mr' ? 'छाननी सुरू' : 'Under Review'}</div>
+                <div className="text-2xl font-bold text-slate-900 mt-0.5">{tNum(inReviewCount)}</div>
               </div>
               <Activity className="w-5 h-5 text-amber-500" />
             </div>
 
             <div className="bg-white border border-[#E5E7E3] rounded-md p-4 flex items-center justify-between">
               <div>
-                <div className="text-[11px] font-semibold text-slate-500 uppercase">Pending Review</div>
-                <div className="text-2xl font-bold text-slate-900 mt-0.5">{submittedCount}</div>
+                <div className="text-[11px] font-semibold text-slate-500 uppercase">{language === 'mr' ? 'सादर / प्रलंबित' : 'Pending Review'}</div>
+                <div className="text-2xl font-bold text-slate-900 mt-0.5">{tNum(submittedCount)}</div>
               </div>
               <RefreshCw className="w-5 h-5 text-blue-500" />
             </div>
@@ -409,12 +412,12 @@ export const AdminDashboard: React.FC = () => {
 
                 <div className="grid grid-cols-2 gap-2 text-[10px] pt-1 text-slate-500">
                   <div className="p-2 bg-white border border-slate-200 rounded text-center">
-                    <span className="block text-slate-400">Cached Replicas</span>
-                    <strong className="text-xs text-slate-900 font-mono">{resilienceStatus?.cached_records_count || 1}</strong>
+                    <span className="block text-slate-400">{language === 'mr' ? 'कॅश प्रतिकृती' : 'Cached Replicas'}</span>
+                    <strong className="text-xs text-slate-900 font-mono">{tNum(resilienceStatus?.cached_records_count || 1)}</strong>
                   </div>
                   <div className="p-2 bg-white border border-slate-200 rounded text-center">
-                    <span className="block text-slate-400">Offline Queue</span>
-                    <strong className="text-xs text-amber-800 font-mono">{resilienceStatus?.pending_queue_count || 0}</strong>
+                    <span className="block text-slate-400">{language === 'mr' ? 'ऑफलाइन रांग' : 'Offline Queue'}</span>
+                    <strong className="text-xs text-amber-800 font-mono">{tNum(resilienceStatus?.pending_queue_count || 0)}</strong>
                   </div>
                 </div>
               </div>
@@ -425,7 +428,7 @@ export const AdminDashboard: React.FC = () => {
                   <div className="flex items-center justify-between border-b border-slate-800 pb-2 mb-2 text-slate-400">
                     <span className="flex items-center gap-1.5 text-xs text-emerald-400 font-bold">
                       <span>●</span>
-                      <span>Real-Time Circuit Breaker & Retry Log Stream</span>
+                      <span>{language === 'mr' ? 'थेट सर्किट ब्रेकर आणि पुनप्रयत्न लॉग प्रवाह' : 'Real-Time Circuit Breaker & Retry Log Stream'}</span>
                     </span>
                     <span className="text-[10px] text-slate-500">Live Auto-Scroll</span>
                   </div>
@@ -433,7 +436,7 @@ export const AdminDashboard: React.FC = () => {
                   <div className="space-y-1.5 max-h-56 overflow-y-auto pr-1">
                     {resilienceLogs.length === 0 ? (
                       <div className="text-slate-500 text-center py-6">
-                        No outage events logged yet. Trigger an outage simulation to view retry attempts in real-time.
+                        {language === 'mr' ? 'कोणतीही अडथळा नोंद नाही. थेट पुनप्रयत्न पाहण्यासाठी आउटेज सिम्युलेशन ट्रिगर करा.' : 'No outage events logged yet. Trigger an outage simulation to view retry attempts in real-time.'}
                       </div>
                     ) : (
                       resilienceLogs.map((lg) => {
@@ -445,7 +448,7 @@ export const AdminDashboard: React.FC = () => {
                           <div key={lg.id} className="p-1.5 bg-slate-800/80 rounded border border-slate-700/50">
                             <div className="flex justify-between text-[10px] text-slate-400 mb-0.5">
                               <span className="font-bold text-slate-200">[{lg.department_id}] {lg.action}</span>
-                              <span className="text-slate-500">{new Date(lg.timestamp).toLocaleTimeString('en-IN')}</span>
+                              <span className="text-slate-500">{tDate(lg.timestamp, { hour: '2-digit', minute: '2-digit', second: '2-digit' })}</span>
                             </div>
                             <p className={`${levelColor} text-[11px] leading-relaxed`}>{lg.message}</p>
                           </div>
@@ -471,14 +474,14 @@ export const AdminDashboard: React.FC = () => {
       {activeTab === 'APPLICATIONS' && (
         <div className="bg-white border border-[#E5E7E3] rounded-md p-5 space-y-4 shadow-xs">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100">
-            <h2 className="text-base font-bold text-slate-900">Global Applications Queue</h2>
-            <span className="text-xs text-slate-500 font-mono">Total Records: {totalApps}</span>
+            <h2 className="text-base font-bold text-slate-900">{language === 'mr' ? 'सर्व शासकीय अर्जांची यादी' : 'Global Applications Queue'}</h2>
+            <span className="text-xs text-slate-500 font-mono">{language === 'mr' ? 'एकूण नोंदी:' : 'Total Records:'} {tNum(totalApps)}</span>
           </div>
 
           {loading ? (
-            <div className="text-center py-8 text-slate-500 text-xs">Loading all applications...</div>
+            <div className="text-center py-8 text-slate-500 text-xs">{language === 'mr' ? 'अर्ज लोड होत आहेत...' : 'Loading all applications...'}</div>
           ) : applications.length === 0 ? (
-            <div className="text-center py-8 text-slate-500 text-xs">No applications registered yet.</div>
+            <div className="text-center py-8 text-slate-500 text-xs">{language === 'mr' ? 'कोणतेही अर्ज नोंदणीकृत नाहीत.' : 'No applications registered yet.'}</div>
           ) : (
             <div className="space-y-3">
               {applications.map((app) => (
@@ -488,7 +491,7 @@ export const AdminDashboard: React.FC = () => {
                 >
                   <div className="space-y-1">
                     <div className="flex items-center gap-2">
-                      <span className="font-mono font-bold text-slate-900">{app.application_number}</span>
+                      <span className="font-mono font-bold text-slate-900">{tNum(app.application_number)}</span>
                       <span className="font-semibold px-2 py-0.5 rounded border bg-white border-slate-300 text-slate-800">
                         {app.status}
                       </span>
@@ -498,7 +501,7 @@ export const AdminDashboard: React.FC = () => {
                       {app.service_id}
                     </div>
                     <div className="text-slate-400 text-[11px]">
-                      Created: {new Date(app.created_at).toLocaleString('en-IN')}
+                      {language === 'mr' ? 'दिनांक:' : 'Created:'} {tDate(app.created_at)}
                     </div>
                   </div>
 
@@ -510,7 +513,7 @@ export const AdminDashboard: React.FC = () => {
                     className="bg-white hover:bg-slate-100 text-slate-800 border border-slate-300 font-semibold px-3 py-1.5 rounded transition-colors flex items-center justify-center gap-1 shrink-0"
                   >
                     <Search className="w-3.5 h-3.5" />
-                    <span>View Timeline</span>
+                    <span>{language === 'mr' ? 'टाइमलाइन पहा' : 'View Timeline'}</span>
                   </button>
                 </div>
               ))}

@@ -9,6 +9,7 @@ import {
   X
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { fetchGrievances, updateGrievance, Grievance } from '../services/grievanceService';
 
 interface GrievancesQueueProps {
@@ -21,6 +22,7 @@ export const GrievancesQueue: React.FC<GrievancesQueueProps> = ({
   isPlatformAdmin = false
 }) => {
   const { token } = useAuth();
+  const { language, tNum } = useLanguage();
   const [grievances, setGrievances] = useState<Grievance[]>([]);
   const [loading, setLoading] = useState(true);
   const [statusFilter, setStatusFilter] = useState<string>('ALL');
@@ -170,21 +172,21 @@ export const GrievancesQueue: React.FC<GrievancesQueueProps> = ({
         <div className="flex items-center gap-2 text-xs">
           <div className="bg-red-50 border border-red-200 px-3 py-1.5 rounded text-center">
             <div className="font-bold text-red-700 text-sm">
-              {grievances.filter(g => g.escalated && g.status !== 'RESOLVED').length}
+              {tNum(grievances.filter(g => g.escalated && g.status !== 'RESOLVED').length)}
             </div>
-            <div className="text-[10px] text-red-600 font-semibold">Escalated</div>
+            <div className="text-[10px] text-red-600 font-semibold">{language === 'mr' ? 'वरिष्ठांकडे वर्ग' : 'Escalated'}</div>
           </div>
           <div className="bg-amber-50 border border-amber-200 px-3 py-1.5 rounded text-center">
             <div className="font-bold text-amber-800 text-sm">
-              {grievances.filter(g => g.status === 'OPEN' || g.status === 'IN_PROGRESS').length}
+              {tNum(grievances.filter(g => g.status === 'OPEN' || g.status === 'IN_PROGRESS').length)}
             </div>
-            <div className="text-[10px] text-amber-700">Pending Action</div>
+            <div className="text-[10px] text-amber-700">{language === 'mr' ? 'छाननी प्रलंबित' : 'Pending Action'}</div>
           </div>
           <div className="bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded text-center">
             <div className="font-bold text-emerald-800 text-sm">
-              {grievances.filter(g => g.status === 'RESOLVED').length}
+              {tNum(grievances.filter(g => g.status === 'RESOLVED').length)}
             </div>
-            <div className="text-[10px] text-emerald-700">Resolved</div>
+            <div className="text-[10px] text-emerald-700">{language === 'mr' ? 'निकाली काढल्या' : 'Resolved'}</div>
           </div>
         </div>
       </div>

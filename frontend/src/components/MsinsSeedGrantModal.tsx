@@ -12,6 +12,7 @@ import {
   ArrowLeft
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { createConsent, approveConsent } from '../services/consentService';
 import { executeDataExchange } from '../services/dataExchangeService';
 import { submitApplication } from '../services/applicationService';
@@ -28,6 +29,7 @@ export const MsinsSeedGrantModal: React.FC<MsinsSeedGrantModalProps> = ({
   onSuccess
 }) => {
   const { user, token } = useAuth();
+  const { language, t, tDept } = useLanguage();
   const [step, setStep] = useState<1 | 2 | 3>(1); // 1: Form, 2: Auto-Fetching & Consents, 3: Verified Review Screen
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -165,12 +167,12 @@ export const MsinsSeedGrantModal: React.FC<MsinsSeedGrantModalProps> = ({
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                  MSInS Innovation Society
+                  {t('msins_society_badge')}
                 </span>
                 <span className="text-xs text-slate-500 font-mono">MSINS-GRANT-01</span>
               </div>
               <h2 className="text-base font-bold text-slate-900 mt-0.5">
-                MSInS Startup Innovation Seed Grant
+                {t('srv_seed_grant')}
               </h2>
             </div>
           </div>
@@ -196,16 +198,16 @@ export const MsinsSeedGrantModal: React.FC<MsinsSeedGrantModalProps> = ({
               <div className="bg-emerald-50 border border-emerald-200 rounded p-3 text-emerald-900">
                 <div className="font-bold flex items-center gap-1.5 mb-1">
                   <ShieldCheck className="w-4 h-4 text-emerald-700" />
-                  <span>Zero Physical Document Policy (Once-Only Principle)</span>
+                  <span>{t('zero_docs_policy_title')}</span>
                 </div>
                 <p className="text-[11px] text-emerald-800 leading-relaxed">
-                  As part of the Government of Maharashtra Interoperability Framework, your <strong>Revenue Financial Record</strong> and <strong>MSBTE Skill Certification</strong> will be auto-verified via digital consent. No physical scans or manual visits required.
+                  {t('zero_docs_policy_desc')}
                 </p>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Startup / Enterprise Name</label>
+                  <label className="block font-semibold text-slate-700 mb-1">{t('startup_name_label')}</label>
                   <input
                     type="text"
                     required
@@ -215,7 +217,7 @@ export const MsinsSeedGrantModal: React.FC<MsinsSeedGrantModalProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Innovation Sector</label>
+                  <label className="block font-semibold text-slate-700 mb-1">{t('innovation_sector_label')}</label>
                   <select
                     value={sector}
                     onChange={(e) => setSector(e.target.value)}
@@ -232,7 +234,7 @@ export const MsinsSeedGrantModal: React.FC<MsinsSeedGrantModalProps> = ({
 
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Funding Grant Requested (₹)</label>
+                  <label className="block font-semibold text-slate-700 mb-1">{t('funding_requested_label')}</label>
                   <input
                     type="number"
                     required
@@ -242,7 +244,7 @@ export const MsinsSeedGrantModal: React.FC<MsinsSeedGrantModalProps> = ({
                   />
                 </div>
                 <div>
-                  <label className="block font-semibold text-slate-700 mb-1">Nodal Incubator Partner</label>
+                  <label className="block font-semibold text-slate-700 mb-1">{t('nodal_incubator_label')}</label>
                   <input
                     type="text"
                     required
@@ -254,7 +256,7 @@ export const MsinsSeedGrantModal: React.FC<MsinsSeedGrantModalProps> = ({
               </div>
 
               <div>
-                <label className="block font-semibold text-slate-700 mb-1">Brief Solution Description</label>
+                <label className="block font-semibold text-slate-700 mb-1">{t('solution_desc_label')}</label>
                 <textarea
                   rows={2}
                   value={description}
@@ -266,7 +268,7 @@ export const MsinsSeedGrantModal: React.FC<MsinsSeedGrantModalProps> = ({
               <div className="pt-2 border-t border-slate-100 flex items-center justify-between">
                 <span className="text-slate-500 text-[11px] flex items-center gap-1">
                   <Lock className="w-3.5 h-3.5 text-slate-400" />
-                  <span>Requires 2-Department Consent Verification</span>
+                  <span>{t('requires_2dept_consent')}</span>
                 </span>
                 <button
                   type="submit"
@@ -274,10 +276,10 @@ export const MsinsSeedGrantModal: React.FC<MsinsSeedGrantModalProps> = ({
                   className="bg-[#166534] hover:bg-[#15803D] text-white font-semibold px-4 py-2 rounded transition-colors flex items-center gap-1.5 disabled:opacity-50"
                 >
                   {loading ? (
-                    <span>Auto-Fetching Verified Records...</span>
+                    <span>{t('autofetching_records')}</span>
                   ) : (
                     <>
-                      <span>Proceed to Consent & Auto-Fetch</span>
+                      <span>{t('proceed_to_consent_btn')}</span>
                       <ArrowRight className="w-4 h-4" />
                     </>
                   )}
@@ -297,10 +299,10 @@ export const MsinsSeedGrantModal: React.FC<MsinsSeedGrantModalProps> = ({
                   <CheckCircle2 className="w-5 h-5 text-emerald-700 shrink-0" />
                   <div>
                     <div className="font-bold text-xs">
-                      Auto-fetched via consent — no re-upload required.
+                      {t('autofetched_banner_title')}
                     </div>
                     <div className="text-[11px] text-emerald-800">
-                      Cross-department interoperability gateway successfully verified your authentic records from both registries.
+                      {t('autofetched_banner_desc')}
                     </div>
                   </div>
                 </div>
@@ -311,19 +313,19 @@ export const MsinsSeedGrantModal: React.FC<MsinsSeedGrantModalProps> = ({
 
               {/* Startup Application Summary */}
               <div className="bg-slate-50 border border-slate-200 rounded p-3">
-                <div className="text-[11px] font-bold text-slate-500 uppercase mb-1">Applicant & Venture</div>
+                <div className="text-[11px] font-bold text-slate-500 uppercase mb-1">{t('applicant_venture_title')}</div>
                 <div className="grid grid-cols-3 gap-2">
                   <div>
-                    <span className="text-slate-500 block text-[10px]">Venture Name:</span>
+                    <span className="text-slate-500 block text-[10px]">{t('venture_name_label')}</span>
                     <strong className="text-slate-900">{startupName}</strong>
                   </div>
                   <div>
-                    <span className="text-slate-500 block text-[10px]">Sector:</span>
+                    <span className="text-slate-500 block text-[10px]">{t('sector_label')}</span>
                     <strong className="text-slate-900">{sector}</strong>
                   </div>
                   <div>
-                    <span className="text-slate-500 block text-[10px]">Grant Requested:</span>
-                    <strong className="text-slate-900 font-mono text-emerald-800">₹{parseInt(fundingRequested).toLocaleString('en-IN')}</strong>
+                    <span className="text-slate-500 block text-[10px]">{t('grant_requested_label')}</span>
+                    <strong className="text-slate-900 font-mono text-emerald-800">₹{parseInt(fundingRequested).toLocaleString(language === 'mr' ? 'mr-IN' : 'en-IN')}</strong>
                   </div>
                 </div>
               </div>
@@ -333,9 +335,9 @@ export const MsinsSeedGrantModal: React.FC<MsinsSeedGrantModalProps> = ({
                 <div className="bg-amber-50 border border-amber-300 text-amber-950 p-3 rounded text-xs flex items-start gap-2 shadow-xs">
                   <span className="text-base leading-none">⚡</span>
                   <div>
-                    <strong className="font-bold">Circuit Breaker & Resilience Active:</strong>
+                    <strong className="font-bold">{t('circuit_breaker_active_title')}</strong>
                     <p className="text-[11px] text-amber-900 mt-0.5">
-                      The upstream Revenue Department is currently offline (Simulated Outage). MahaSetu automatically attempted 3x exponential backoff retries and gracefully served your verified certificate from the encrypted local cache without failing your application.
+                      {t('circuit_breaker_active_desc')}
                     </p>
                   </div>
                 </div>
@@ -355,32 +357,32 @@ export const MsinsSeedGrantModal: React.FC<MsinsSeedGrantModalProps> = ({
                   }`}>
                     <div className="flex items-center gap-1.5 font-bold text-slate-900">
                       <Coins className="w-4 h-4 text-emerald-700" />
-                      <span>Revenue Department</span>
+                      <span>{tDept('dept_revenue', 'Revenue Department')}</span>
                     </div>
                     <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${
                       revenueData?.resilience_status === 'CACHE_FALLBACK'
                         ? 'text-amber-900 bg-amber-100 border border-amber-300'
                         : 'text-emerald-800 bg-emerald-100'
                     }`}>
-                      {revenueData?.resilience_status === 'CACHE_FALLBACK' ? '⚡ Cache Replica (Dept Offline)' : '● Verified'}
+                      {revenueData?.resilience_status === 'CACHE_FALLBACK' ? `⚡ ${t('cache_replica_badge')}` : `● ${t('verified_badge')}`}
                     </span>
                   </div>
 
                   <div className="space-y-1.5 text-[11px]">
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Certificate No:</span>
+                      <span className="text-slate-500">{t('cert_num_label')}</span>
                       <span className="font-mono font-bold text-slate-800">{revenueData?.certificate_number}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Annual Income:</span>
-                      <span className="font-mono font-bold text-emerald-900">₹{revenueData?.annual_income?.toLocaleString('en-IN')}</span>
+                      <span className="text-slate-500">{t('verified_income_label')}</span>
+                      <span className="font-mono font-bold text-emerald-900">₹{revenueData?.annual_income?.toLocaleString(language === 'mr' ? 'mr-IN' : 'en-IN')}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Income Slab:</span>
+                      <span className="text-slate-500">{t('income_slab_label')}</span>
                       <span className="text-slate-800 font-medium">{revenueData?.income_category}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Issuing Office:</span>
+                      <span className="text-slate-500">{t('issuing_office_label')}</span>
                       <span className="text-slate-800">{revenueData?.issuing_authority}</span>
                     </div>
                     <div className="flex justify-between pt-1 border-t border-emerald-100 text-[10px] text-slate-500">
@@ -395,30 +397,30 @@ export const MsinsSeedGrantModal: React.FC<MsinsSeedGrantModalProps> = ({
                   <div className="flex items-center justify-between border-b border-emerald-200/60 pb-2">
                     <div className="flex items-center gap-1.5 font-bold text-slate-900">
                       <GraduationCap className="w-4 h-4 text-emerald-700" />
-                      <span>Skills & Innovation Dept</span>
+                      <span>{tDept('dept_skills', 'Skills & Innovation Dept')}</span>
                     </div>
                     <span className="text-[10px] font-semibold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded">
-                      ● Verified
+                      ● {t('verified_badge')}
                     </span>
                   </div>
 
                   <div className="space-y-1.5 text-[11px]">
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Trainee ID:</span>
+                      <span className="text-slate-500">{t('trainee_id_label')}</span>
                       <span className="font-mono font-bold text-slate-800">{skillsData?.trainee_id}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Trade / Course:</span>
+                      <span className="text-slate-500">{t('trade_course_label')}</span>
                       <span className="font-medium text-slate-900 truncate max-w-[170px]" title={skillsData?.trade_course}>
                         {skillsData?.trade_course}
                       </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Level & Grade:</span>
+                      <span className="text-slate-500">{t('level_grade_label')}</span>
                       <span className="text-emerald-900 font-bold">{skillsData?.certification_level} ({skillsData?.grade})</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-slate-500">Issuing Board:</span>
+                      <span className="text-slate-500">{t('issuing_board_label')}</span>
                       <span className="text-slate-800">{skillsData?.issuing_board}</span>
                     </div>
                     <div className="flex justify-between pt-1 border-t border-emerald-100 text-[10px] text-slate-500">
@@ -439,7 +441,7 @@ export const MsinsSeedGrantModal: React.FC<MsinsSeedGrantModalProps> = ({
                   className="px-3 py-1.5 rounded text-slate-700 hover:bg-slate-100 border border-slate-300 font-medium text-xs flex items-center gap-1"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
-                  <span>Back to Edit</span>
+                  <span>{t('back_to_edit_btn')}</span>
                 </button>
 
                 <button
@@ -449,11 +451,11 @@ export const MsinsSeedGrantModal: React.FC<MsinsSeedGrantModalProps> = ({
                   className="bg-[#166534] hover:bg-[#15803D] text-white font-semibold px-5 py-2 rounded transition-colors flex items-center gap-1.5 disabled:opacity-50"
                 >
                   {loading ? (
-                    <span>Submitting Application to MSInS...</span>
+                    <span>{t('submitting_app_to_dept')}</span>
                   ) : (
                     <>
                       <FileCheck className="w-4 h-4" />
-                      <span>Confirm & Submit Application</span>
+                      <span>{t('confirm_submit_btn')}</span>
                     </>
                   )}
                 </button>
@@ -468,3 +470,4 @@ export const MsinsSeedGrantModal: React.FC<MsinsSeedGrantModalProps> = ({
     </div>
   );
 };
+

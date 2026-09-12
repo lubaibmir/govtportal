@@ -26,7 +26,7 @@ import { Service } from '../types';
 
 export const CitizenDashboard: React.FC = () => {
   const { user, token } = useAuth();
-  const { t } = useLanguage();
+  const { t, tDept, tService, tStatus, tNum, tCurrency, tDate } = useLanguage();
   const [applications, setApplications] = useState<ApplicationRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<'MY_APPS' | 'NEW_APP' | 'CONSENTS' | 'TRACKING' | 'GRIEVANCES'>('MY_APPS');
@@ -120,15 +120,15 @@ export const CitizenDashboard: React.FC = () => {
   const getStatusDisplay = (status: string) => {
     switch (status) {
       case 'APPROVED':
-        return { label: '● Approved', cls: 'text-[#166534] bg-emerald-50 border-emerald-200' };
+        return { label: `● ${t('status_approved', 'Approved & Issued')}`, cls: 'text-[#166534] bg-emerald-50 border-emerald-200' };
       case 'IN_REVIEW':
-        return { label: '● Under Department Review', cls: 'text-amber-800 bg-amber-50 border-amber-200' };
+        return { label: `● ${t('status_in_review', 'Under Department Review')}`, cls: 'text-amber-800 bg-amber-50 border-amber-200' };
       case 'SUBMITTED':
-        return { label: '● Submitted', cls: 'text-blue-800 bg-blue-50 border-blue-200' };
+        return { label: `● ${t('status_submitted', 'Submitted')}`, cls: 'text-blue-800 bg-blue-50 border-blue-200' };
       case 'REJECTED':
-        return { label: '● Rejected', cls: 'text-red-800 bg-red-50 border-red-200' };
+        return { label: `● ${t('status_rejected', 'Rejected')}`, cls: 'text-red-800 bg-red-50 border-red-200' };
       default:
-        return { label: `● ${status}`, cls: 'text-slate-700 bg-slate-100 border-slate-200' };
+        return { label: `● ${tStatus(status)}`, cls: 'text-slate-700 bg-slate-100 border-slate-200' };
     }
   };
 
@@ -141,35 +141,11 @@ export const CitizenDashboard: React.FC = () => {
   };
 
   const getServiceTitle = (serviceId: string) => {
-    switch (serviceId) {
-      case 'srv_msins_seed_grant':
-        return 'MSInS Startup Innovation Seed Grant';
-      case 'srv_ind_biz_license':
-        return 'Small Scale Business License';
-      case 'srv_rev_income_cert':
-        return 'Income Certificate Verification';
-      case 'srv_edu_degree_verify':
-        return 'Higher Education Degree Verification';
-      case 'srv_skills_cert':
-        return 'ITI & Polytechnic Skill Certificate';
-      default:
-        return serviceId;
-    }
+    return tService(serviceId);
   };
 
   const getDeptTitle = (deptId: string) => {
-    switch (deptId) {
-      case 'dept_skills':
-        return 'Skills & Innovation (MSInS)';
-      case 'dept_industries':
-        return 'Industries';
-      case 'dept_revenue':
-        return 'Revenue';
-      case 'dept_education':
-        return 'Higher Education';
-      default:
-        return deptId;
-    }
+    return tDept(deptId);
   };
 
   return (
@@ -180,16 +156,16 @@ export const CitizenDashboard: React.FC = () => {
         <div>
           <div className="flex items-center gap-2">
             <h1 className="text-xl font-bold text-slate-900">
-              Welcome, {user?.full_name?.split(' ')[0] || 'Citizen'}
+              {t('citizen_welcome_user', 'Welcome,')} {user?.full_name?.split(' ')[0] || (t('role_citizen', 'Citizen'))}
             </h1>
             <span className="text-[11px] font-semibold text-[#166534] bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded">
-              Verified Citizen Identity
+              {t('verified_citizen_badge', 'Verified Citizen Identity')}
             </span>
           </div>
           <p className="text-xs text-slate-600 mt-1 flex items-center gap-3">
             <span>{user?.email}</span>
             <span>•</span>
-            <span>{user?.citizen_profile?.city || 'Mumbai'}, Maharashtra</span>
+            <span>{user?.citizen_profile?.city || 'Mumbai'}, {t('govt_maharashtra', 'Maharashtra')}</span>
           </p>
         </div>
 
@@ -203,7 +179,7 @@ export const CitizenDashboard: React.FC = () => {
                 : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300'
             }`}
           >
-            {t('tab_my_apps', 'My Applications')} ({applications.length})
+            {t('tab_my_apps', 'My Applications')} ({tNum(applications.length)})
           </button>
           <button
             onClick={() => {
@@ -257,28 +233,29 @@ export const CitizenDashboard: React.FC = () => {
         </div>
       </div>
 
+
       {/* QUICK SUMMARY ROW */}
       <div className="grid grid-cols-3 gap-4">
         <div className="bg-white border border-[#E5E7E3] rounded-md p-4 flex items-center justify-between">
           <div>
-            <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Active Applications</div>
-            <div className="text-2xl font-bold text-slate-900 mt-0.5">{applications.length}</div>
+            <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{t('active_applications', 'Active Applications')}</div>
+            <div className="text-2xl font-bold text-slate-900 mt-0.5">{tNum(applications.length)}</div>
           </div>
           <FileText className="w-5 h-5 text-slate-400" />
         </div>
         <div className="bg-white border border-[#E5E7E3] rounded-md p-4 flex items-center justify-between">
           <div>
-            <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Pending Action</div>
+            <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{t('pending_action', 'Pending Action')}</div>
             <div className="text-2xl font-bold text-slate-900 mt-0.5">
-              {applications.filter(a => a.status === 'SUBMITTED' || a.status === 'IN_REVIEW').length}
+              {tNum(applications.filter(a => a.status === 'SUBMITTED' || a.status === 'IN_REVIEW').length)}
             </div>
           </div>
           <AlertCircle className="w-5 h-5 text-slate-400" />
         </div>
         <div className="bg-white border border-[#E5E7E3] rounded-md p-4 flex items-center justify-between">
           <div>
-            <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">Active Consents</div>
-            <div className="text-2xl font-bold text-slate-900 mt-0.5">{applications.length > 0 ? applications.length * 2 : 1}</div>
+            <div className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">{t('active_consents', 'Active Consents')}</div>
+            <div className="text-2xl font-bold text-slate-900 mt-0.5">{tNum(applications.length > 0 ? applications.length * 2 : 1)}</div>
           </div>
           <ShieldCheck className="w-5 h-5 text-slate-400" />
         </div>
@@ -314,14 +291,14 @@ export const CitizenDashboard: React.FC = () => {
           <ImpactMetricsPanel />
 
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-slate-900">Your Submitted Applications</h2>
+            <h2 className="text-base font-bold text-slate-900">{t('your_submitted_apps', 'Your Submitted Applications')}</h2>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsMsinsOpen(true)}
                 className="bg-emerald-700 hover:bg-emerald-800 text-white text-xs font-semibold px-3 py-1.5 rounded transition-colors flex items-center gap-1.5 shadow-xs"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Apply for MSInS Seed Grant (Flagship)</span>
+                <span>{t('apply_msins_seed_btn', 'Apply for MSInS Seed Grant (Flagship)')}</span>
               </button>
               <button
                 onClick={handleInitiateBusinessLicense}
@@ -329,21 +306,21 @@ export const CitizenDashboard: React.FC = () => {
                 className="bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-xs font-semibold px-3 py-1.5 rounded transition-colors flex items-center gap-1.5"
               >
                 <Plus className="w-3.5 h-3.5" />
-                <span>Business License</span>
+                <span>{t('apply_biz_license_btn', 'Business License')}</span>
               </button>
             </div>
           </div>
 
           {loading ? (
             <div className="bg-white border border-[#E5E7E3] rounded-md p-8 text-center text-slate-500 text-sm">
-              Loading applications list...
+              {t('loading_services', 'Loading applications list...')}
             </div>
           ) : applications.length === 0 ? (
             <div className="bg-white border border-[#E5E7E3] rounded-md p-8 text-center space-y-3">
               <Building2 className="w-8 h-8 text-slate-400 mx-auto" />
-              <p className="text-sm font-semibold text-slate-800">No applications submitted yet</p>
+              <p className="text-sm font-semibold text-slate-800">{t('no_apps_submitted', 'No applications submitted yet')}</p>
               <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                Apply for MSInS startup seed grants, business licenses, and government certificates with zero physical paperwork.
+                {t('no_apps_desc', 'Apply for MSInS startup seed grants, business licenses, and government certificates with zero physical paperwork.')}
               </p>
               <div className="flex justify-center gap-3 pt-2">
                 <button
@@ -351,7 +328,7 @@ export const CitizenDashboard: React.FC = () => {
                   className="bg-[#166534] hover:bg-[#15803D] text-white text-xs font-semibold px-4 py-2 rounded transition-colors flex items-center gap-1.5"
                 >
                   <Plus className="w-3.5 h-3.5" />
-                  <span>Apply for MSInS Startup Seed Grant (2-Source Auto-Fetch)</span>
+                  <span>{t('apply_msins_seed_btn', 'Apply for MSInS Startup Seed Grant (2-Source Auto-Fetch)')}</span>
                 </button>
               </div>
             </div>
@@ -378,11 +355,11 @@ export const CitizenDashboard: React.FC = () => {
                       </div>
                       
                       <div className="text-xs text-slate-500 mt-1 flex flex-wrap items-center gap-3">
-                        <span>Application: <strong className="font-mono text-slate-800">{app.application_number}</strong></span>
+                        <span>{t('tracking_number_label', 'Application:')} <strong className="font-mono text-slate-800">{tNum(app.application_number)}</strong></span>
                         <span>•</span>
-                        <span>Department: {deptName}</span>
+                        <span>{t('filter_by_dept', 'Department:')} {deptName}</span>
                         <span>•</span>
-                        <span>Submitted: {new Date(app.created_at).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' })}</span>
+                        <span>{t('updated_label', 'Submitted:')} {tDate(app.created_at, { day: 'numeric', month: 'short', year: 'numeric' })}</span>
                       </div>
 
                       {/* Display Auto-Fetched Verification Badges */}
@@ -390,18 +367,18 @@ export const CitizenDashboard: React.FC = () => {
                         {app.application_data?.revenue_verification && (
                           <div className="text-[11px] text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded flex items-center gap-1">
                             <CheckCircle2 className="w-3 h-3 text-emerald-700" />
-                            <span>Verified Revenue Income: ₹{app.application_data.revenue_verification.annual_income} (Cert #{app.application_data.revenue_verification.certificate_number})</span>
+                            <span>{t('retrieves_verified', 'Verified Revenue Income:')} {tCurrency(app.application_data.revenue_verification.annual_income)} ({t('cert_num_label', 'Cert #')} {tNum(app.application_data.revenue_verification.certificate_number)})</span>
                           </div>
                         )}
                         {app.application_data?.skills_verification && (
                           <div className="text-[11px] text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded flex items-center gap-1">
                             <CheckCircle2 className="w-3 h-3 text-emerald-700" />
-                            <span>Verified MSBTE Skill: {app.application_data.skills_verification.trade_course} (Trainee #{app.application_data.skills_verification.trainee_id})</span>
+                            <span>{t('retrieves_verified', 'Verified MSBTE Skill:')} {app.application_data.skills_verification.trade_course} (ID #{tNum(app.application_data.skills_verification.trainee_id)})</span>
                           </div>
                         )}
                         {app.application_data?.income_certificate_number && (
                           <div className="text-[11px] text-emerald-800 bg-emerald-50 border border-emerald-200 px-2.5 py-0.5 rounded inline-block">
-                            Verified Revenue Data: Cert #{app.application_data.income_certificate_number} (Annual Income: ₹{app.application_data.verified_annual_income})
+                            {t('verified_cross_dept_info', 'Verified Revenue Data:')} {t('cert_num_label', 'Cert #')} {tNum(app.application_data.income_certificate_number)} ({t('verified_income_label', 'Annual Income:')} {tCurrency(app.application_data.verified_annual_income)})
                           </div>
                         )}
                       </div>
@@ -420,7 +397,7 @@ export const CitizenDashboard: React.FC = () => {
                         className="bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 text-xs font-semibold px-3 py-1.5 rounded transition-colors flex items-center justify-center gap-1"
                       >
                         <ShieldAlert className="w-3.5 h-3.5 text-red-600" />
-                        <span>Raise Grievance</span>
+                        <span>{t('raise_grievance_btn', 'Raise Grievance')}</span>
                       </button>
 
                       <button 
@@ -430,7 +407,7 @@ export const CitizenDashboard: React.FC = () => {
                         }}
                         className="bg-slate-100 hover:bg-slate-200 text-slate-800 border border-slate-300 text-xs font-semibold px-3 py-1.5 rounded transition-colors flex items-center justify-center gap-1"
                       >
-                        <span>View Timeline</span>
+                        <span>{t('view_timeline_btn', 'View Timeline')}</span>
                         <ArrowRight className="w-3.5 h-3.5" />
                       </button>
                     </div>
@@ -462,11 +439,12 @@ export const CitizenDashboard: React.FC = () => {
       {activeTab === 'NEW_APP' && (
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <h2 className="text-base font-bold text-slate-900">Select a Service to Apply</h2>
+            <h2 className="text-base font-bold text-slate-900">{t('select_service_to_apply', 'Select a Service to Apply')}</h2>
           </div>
           <ServiceCatalogue onSelectService={handleSelectService} />
         </div>
       )}
+
 
       {/* RAISE GRIEVANCE MODAL */}
       <RaiseGrievanceModal

@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { X, AlertCircle, ShieldAlert, Send } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { createGrievance, Grievance } from '../services/grievanceService';
 
 interface RaiseGrievanceModalProps {
@@ -21,6 +22,7 @@ export const RaiseGrievanceModal: React.FC<RaiseGrievanceModalProps> = ({
   initialApplicationNumber
 }) => {
   const { token } = useAuth();
+  const { language, t, tDept } = useLanguage();
   const [departmentId, setDepartmentId] = useState(initialDepartmentId || 'dept_revenue');
   const [category, setCategory] = useState('DELAYED_PROCESSING');
   const [applicationNumber, setApplicationNumber] = useState(initialApplicationNumber || '');
@@ -38,12 +40,12 @@ export const RaiseGrievanceModal: React.FC<RaiseGrievanceModalProps> = ({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!token) {
-      setError('Please log in to submit a grievance');
+      setError(language === 'mr' ? 'तक्रार नोंदवण्यासाठी कृपया लॉगिन करा' : 'Please log in to submit a grievance');
       return;
     }
 
     if (description.trim().length < 10) {
-      setError('Please describe your grievance in at least 10 characters.');
+      setError(language === 'mr' ? 'कृपया तक्रारीचे वर्णन किमान १० अक्षरांमध्ये प्रविष्ट करा.' : 'Please describe your grievance in at least 10 characters.');
       return;
     }
 
@@ -63,7 +65,7 @@ export const RaiseGrievanceModal: React.FC<RaiseGrievanceModalProps> = ({
       setDescription('');
       onClose();
     } catch (err: any) {
-      setError(err.message || 'Failed to submit grievance');
+      setError(err.message || (language === 'mr' ? 'तक्रार नोंदवण्यात त्रुटी आली' : 'Failed to submit grievance'));
     } finally {
       setLoading(false);
     }
@@ -80,8 +82,8 @@ export const RaiseGrievanceModal: React.FC<RaiseGrievanceModalProps> = ({
               <ShieldAlert className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h3 className="text-xl font-bold">Raise RTS Grievance</h3>
-              <p className="text-xs text-red-100 mt-0.5">Maharashtra Right to Public Services Act (RTS 2015)</p>
+              <h3 className="text-xl font-bold">{t('raise_rts_grievance_title')}</h3>
+              <p className="text-xs text-red-100 mt-0.5">{t('rts_act_2015')}</p>
             </div>
           </div>
           <button
@@ -102,45 +104,55 @@ export const RaiseGrievanceModal: React.FC<RaiseGrievanceModalProps> = ({
           )}
 
           <div className="p-3 bg-amber-50 rounded-xl border border-amber-200/60 text-xs text-amber-800">
-            <span className="font-semibold">SLA Guarantee:</span> Grievances are reviewed by the concerned nodal officer within 48 hours. Unresolved grievances auto-escalate directly to the Department Head.
+            {t('rts_guarantee_notice')}
           </div>
 
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">
-              Concerned Department
+              {t('concerned_dept_label')}
             </label>
             <select
               value={departmentId}
               onChange={(e) => setDepartmentId(e.target.value)}
               className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:bg-white transition-all"
             >
-              <option value="dept_revenue">Revenue Department (Income, Land, Residence)</option>
-              <option value="dept_education">Higher & Technical Education (Degree, Transcripts)</option>
-              <option value="dept_industries">Industries Department (MSME, Trade Licenses)</option>
-              <option value="dept_skills">MSInS / Skills & Entrepreneurship (Seed Grant, ITI)</option>
+              <option value="dept_revenue">{tDept('dept_revenue', 'Revenue Department')}</option>
+              <option value="dept_education">{tDept('dept_education', 'Higher & Technical Education')}</option>
+              <option value="dept_industries">{tDept('dept_industries', 'Industries Department')}</option>
+              <option value="dept_skills">{tDept('dept_skills', 'MSInS / Skills & Innovation Society')}</option>
             </select>
           </div>
 
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">
-              Grievance Category
+              {t('grievance_category_label')}
             </label>
             <select
               value={category}
               onChange={(e) => setCategory(e.target.value)}
               className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:bg-white transition-all"
             >
-              <option value="DELAYED_PROCESSING">Delayed Processing (Exceeded RTS Timelines)</option>
-              <option value="DOCUMENT_VERIFICATION_ISSUE">Cross-Department Verification Discrepancy</option>
-              <option value="TECHNICAL_GLITCH">MahaSetu Gateway Interoperability Failure</option>
-              <option value="SERVICE_DENIAL">Unjustified Application Rejection</option>
-              <option value="OTHER">Other Administrative Grievance</option>
+              <option value="DELAYED_PROCESSING">
+                {language === 'mr' ? 'प्रक्रियेत विलंब (लोकसेवा हमी मुदत ओलांडली)' : 'Delayed Processing (Exceeded RTS Timelines)'}
+              </option>
+              <option value="DOCUMENT_VERIFICATION_ISSUE">
+                {language === 'mr' ? 'आंतर-विभागीय पडताळणी विसंगती' : 'Cross-Department Verification Discrepancy'}
+              </option>
+              <option value="TECHNICAL_GLITCH">
+                {language === 'mr' ? 'महासेतू गेटवे तांत्रिक त्रुटी' : 'MahaSetu Gateway Interoperability Failure'}
+              </option>
+              <option value="SERVICE_DENIAL">
+                {language === 'mr' ? 'अवाजवी अर्ज नकार' : 'Unjustified Application Rejection'}
+              </option>
+              <option value="OTHER">
+                {language === 'mr' ? 'इतर प्रशासकीय तक्रार' : 'Other Administrative Grievance'}
+              </option>
             </select>
           </div>
 
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">
-              Linked Application Number <span className="text-slate-400 font-normal lowercase">(optional)</span>
+              {t('linked_app_number_label')}
             </label>
             <input
               type="text"
@@ -153,13 +165,13 @@ export const RaiseGrievanceModal: React.FC<RaiseGrievanceModalProps> = ({
 
           <div>
             <label className="block text-xs font-semibold text-slate-700 mb-1.5 uppercase tracking-wider">
-              Grievance Description
+              {t('grievance_desc_label')}
             </label>
             <textarea
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Please provide details of the issue, delays experienced, or incorrect data flags..."
+              placeholder={t('grievance_desc_placeholder')}
               className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:bg-white transition-all resize-none"
               required
             />
@@ -171,7 +183,7 @@ export const RaiseGrievanceModal: React.FC<RaiseGrievanceModalProps> = ({
               onClick={onClose}
               className="px-5 py-2.5 border border-slate-200 text-slate-600 rounded-xl text-sm font-semibold hover:bg-slate-50 transition-colors"
             >
-              Cancel
+              {t('cancel_btn')}
             </button>
             <button
               type="submit"
@@ -179,10 +191,10 @@ export const RaiseGrievanceModal: React.FC<RaiseGrievanceModalProps> = ({
               className="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl text-sm font-semibold shadow-md hover:shadow-lg disabled:opacity-50 flex items-center space-x-2 transition-all"
             >
               {loading ? (
-                <span>Submitting...</span>
+                <span>{t('submitting_grievance')}</span>
               ) : (
                 <>
-                  <span>Submit Grievance</span>
+                  <span>{t('submit_grievance_btn')}</span>
                   <Send className="w-4 h-4" />
                 </>
               )}
@@ -193,3 +205,4 @@ export const RaiseGrievanceModal: React.FC<RaiseGrievanceModalProps> = ({
     </div>
   );
 };
+

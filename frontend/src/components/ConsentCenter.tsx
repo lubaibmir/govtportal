@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { ShieldCheck, ShieldX, RefreshCw } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { fetchUserConsents, revokeConsent, ConsentRecord } from '../services/consentService';
 
 export const ConsentCenter: React.FC = () => {
   const { token } = useAuth();
+  const { t, tDept, tStatus, tDate } = useLanguage();
   const [consents, setConsents] = useState<ConsentRecord[]>([]);
   const [loading, setLoading] = useState(true);
   const [revokingId, setRevokingId] = useState<string | null>(null);
@@ -30,7 +32,7 @@ export const ConsentCenter: React.FC = () => {
     setSuccessMsg(null);
     try {
       await revokeConsent(consentId, token);
-      setSuccessMsg('Digital consent revoked successfully. Further departmental data access has been cryptographically blocked.');
+      setSuccessMsg(t('consent_revoked_success', 'Digital consent revoked successfully. Further departmental data access has been cryptographically blocked.'));
       await loadConsents();
     } catch (err: any) {
       setErrorMsg(err.message || 'Failed to revoke consent.');
@@ -42,13 +44,13 @@ export const ConsentCenter: React.FC = () => {
   const getStatusDisplay = (status: string) => {
     switch (status) {
       case 'ACTIVE':
-        return { label: 'Active Consent', cls: 'text-[#166534] bg-emerald-50 border-emerald-200' };
+        return { label: t('status_active', 'Active Consent'), cls: 'text-[#166534] bg-emerald-50 border-emerald-200' };
       case 'REVOKED':
-        return { label: 'Revoked', cls: 'text-red-800 bg-red-50 border-red-200' };
+        return { label: t('status_revoked', 'Revoked'), cls: 'text-red-800 bg-red-50 border-red-200' };
       case 'DENIED':
-        return { label: 'Denied', cls: 'text-amber-800 bg-amber-50 border-amber-200' };
+        return { label: t('status_denied', 'Denied'), cls: 'text-amber-800 bg-amber-50 border-amber-200' };
       default:
-        return { label: status, cls: 'text-slate-700 bg-slate-100 border-slate-200' };
+        return { label: tStatus(status), cls: 'text-slate-700 bg-slate-100 border-slate-200' };
     }
   };
 
@@ -59,13 +61,13 @@ export const ConsentCenter: React.FC = () => {
       {errorMsg && (
         <div className="bg-red-50 border border-red-200 text-red-900 p-3.5 rounded text-xs flex items-center justify-between">
           <span>{errorMsg}</span>
-          <button onClick={() => setErrorMsg(null)} className="text-red-700 font-bold ml-2">✕</button>
+          <button onClick={() => setErrorMsg(null)} className="text-red-700 font-bold ml-2 cursor-pointer">✕</button>
         </div>
       )}
       {successMsg && (
         <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 p-3.5 rounded text-xs flex items-center justify-between">
           <span>{successMsg}</span>
-          <button onClick={() => setSuccessMsg(null)} className="text-emerald-700 font-bold ml-2">✕</button>
+          <button onClick={() => setSuccessMsg(null)} className="text-emerald-700 font-bold ml-2 cursor-pointer">✕</button>
         </div>
       )}
 
@@ -74,15 +76,15 @@ export const ConsentCenter: React.FC = () => {
         <div>
           <h2 className="text-base font-bold text-slate-900 flex items-center gap-1.5">
             <ShieldCheck className="w-4 h-4 text-[#166534]" />
-            <span>Digital Consent Management Hub</span>
+            <span>{t('consent_hub_title', 'Digital Consent Management Hub')}</span>
           </h2>
           <p className="text-xs text-slate-500 mt-0.5">
-            View, inspect, or revoke digital permissions granted for cross-department data sharing
+            {t('consent_hub_subtitle', 'View, inspect, or revoke digital permissions granted for cross-department data sharing')}
           </p>
         </div>
         <button
           onClick={loadConsents}
-          className="p-1.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-300 transition-colors"
+          className="p-1.5 rounded bg-slate-100 hover:bg-slate-200 text-slate-600 border border-slate-300 transition-colors cursor-pointer"
           title="Refresh Consents"
         >
           <RefreshCw className="w-4 h-4" />
@@ -91,11 +93,11 @@ export const ConsentCenter: React.FC = () => {
 
       {loading ? (
         <div className="bg-white border border-[#E5E7E3] rounded-md p-8 text-center text-slate-500 text-xs">
-          Loading consent records...
+          {t('loading_services', 'Loading consent records...')}
         </div>
       ) : consents.length === 0 ? (
         <div className="bg-white border border-[#E5E7E3] rounded-md p-8 text-center text-slate-500 text-xs">
-          No digital consent authorizations recorded yet.
+          {t('no_consents_recorded', 'No digital consent authorizations recorded yet.')}
         </div>
       ) : (
         <div className="space-y-3">
@@ -123,11 +125,11 @@ export const ConsentCenter: React.FC = () => {
                   </p>
 
                   <div className="text-slate-500 text-[11px] flex flex-wrap items-center gap-3">
-                    <span>Requesting: <strong className="text-slate-800">{c.requesting_department_id}</strong></span>
+                    <span>{t('filter_by_dept', 'Requesting:')} <strong className="text-slate-800">{tDept(c.requesting_department_id)}</strong></span>
                     <span>•</span>
-                    <span>Source: <strong className="text-slate-800">{c.providing_department_id}</strong></span>
+                    <span>{t('providing_dept_label', 'Source:')} <strong className="text-slate-800">{tDept(c.providing_department_id)}</strong></span>
                     <span>•</span>
-                    <span>Expires: {new Date(c.expires_at).toLocaleString('en-IN')}</span>
+                    <span>{t('updated_label', 'Expires:')} {tDate(c.expires_at)}</span>
                   </div>
                 </div>
 
@@ -135,10 +137,10 @@ export const ConsentCenter: React.FC = () => {
                   <button
                     onClick={() => handleRevoke(c.id)}
                     disabled={revokingId === c.id}
-                    className="bg-red-50 hover:bg-red-100 text-red-700 border border-red-300 px-3 py-1.5 rounded text-xs font-semibold transition-colors flex items-center justify-center gap-1 shrink-0"
+                    className="bg-red-50 hover:bg-red-100 text-red-700 border border-red-300 px-3 py-1.5 rounded text-xs font-semibold transition-colors flex items-center justify-center gap-1 shrink-0 cursor-pointer"
                   >
                     <ShieldX className="w-3.5 h-3.5" />
-                    <span>{revokingId === c.id ? 'Revoking Access...' : 'Revoke Access'}</span>
+                    <span>{revokingId === c.id ? t('revoking_access', 'Revoking Access...') : t('revoke_access_btn', 'Revoke Access')}</span>
                   </button>
                 )}
               </div>
@@ -150,3 +152,4 @@ export const ConsentCenter: React.FC = () => {
     </div>
   );
 };
+

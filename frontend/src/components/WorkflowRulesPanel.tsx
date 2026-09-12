@@ -11,10 +11,12 @@ import {
   RotateCcw
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { fetchWorkflowRules, updateWorkflowRule, resetWorkflowRules, WorkflowRule } from '../services/workflowService';
 
 export const WorkflowRulesPanel: React.FC = () => {
   const { token } = useAuth();
+  const { language, tCurrency } = useLanguage();
   const [rules, setRules] = useState<WorkflowRule[]>([]);
   const [loading, setLoading] = useState(true);
   const [savingRuleId, setSavingRuleId] = useState<string | null>(null);
@@ -316,9 +318,9 @@ export const WorkflowRulesPanel: React.FC = () => {
                       <div className="flex items-center justify-between text-slate-700 font-medium mb-1">
                         <span className="flex items-center gap-1">
                           <Sliders className="w-3.5 h-3.5 text-slate-500" />
-                          <span>Max Annual Income Auto-Approval Cap:</span>
+                          <span>{language === 'mr' ? 'कमाल वार्षिक उत्पन्न स्वयंचलित मंजुरी मर्यादा:' : 'Max Annual Income Auto-Approval Cap:'}</span>
                         </span>
-                        <strong className="text-slate-900 font-mono">₹{Number(draft.max_income).toLocaleString('en-IN')}</strong>
+                        <strong className="text-slate-900 font-mono">{tCurrency(draft.max_income)}</strong>
                       </div>
                       <input
                         type="range"
@@ -336,9 +338,9 @@ export const WorkflowRulesPanel: React.FC = () => {
                         className="w-full accent-emerald-700"
                       />
                       <div className="flex justify-between text-[10px] text-slate-400 mt-0.5">
-                        <span>₹1,00,000</span>
-                        <span>₹10,00,000</span>
-                        <span>₹20,00,000</span>
+                        <span>{tCurrency(100000)}</span>
+                        <span>{tCurrency(1000000)}</span>
+                        <span>{tCurrency(2000000)}</span>
                       </div>
                     </div>
                   )}

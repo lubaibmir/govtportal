@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { X, KeyRound, ShieldAlert, ArrowRight } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 
 interface LoginModalProps {
   isOpen: boolean;
@@ -9,6 +10,7 @@ interface LoginModalProps {
 
 export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
   const { login } = useAuth();
+  const { t } = useLanguage();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
@@ -52,7 +54,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1"
+          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
         >
           <X className="w-4 h-4" />
         </button>
@@ -63,8 +65,8 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
             <KeyRound className="w-4 h-4" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-slate-900">MahaSetu Sign In</h2>
-            <p className="text-xs text-slate-500">Government of Maharashtra Unified SSO</p>
+            <h2 className="text-base font-bold text-slate-900">{t('login_title', 'MahaSetu Sign In')}</h2>
+            <p className="text-xs text-slate-500">{t('login_subtitle', 'Government of Maharashtra Unified SSO')}</p>
           </div>
         </div>
 
@@ -79,7 +81,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         <form onSubmit={handleSubmit} className="space-y-3 text-xs">
           <div>
             <label className="block font-semibold text-slate-700 mb-1">
-              Email Address
+              {t('email_label', 'Email Address')}
             </label>
             <input
               type="email"
@@ -93,7 +95,7 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
 
           <div>
             <label className="block font-semibold text-slate-700 mb-1">
-              Password
+              {t('password_label', 'Password')}
             </label>
             <input
               type="password"
@@ -108,13 +110,13 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-2 bg-[#166534] hover:bg-[#15803D] text-white font-semibold text-xs rounded transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 mt-2"
+            className="w-full py-2 bg-[#166534] hover:bg-[#15803D] text-white font-semibold text-xs rounded transition-colors flex items-center justify-center gap-1.5 disabled:opacity-50 mt-2 cursor-pointer"
           >
             {loading ? (
-              <span>Authenticating...</span>
+              <span>{t('authenticating', 'Authenticating...')}</span>
             ) : (
               <>
-                <span>Sign In</span>
+                <span>{t('sign_in_btn', 'Sign In')}</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </>
             )}
@@ -124,41 +126,41 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
         {/* Quick Demo Personas */}
         <div className="pt-4 border-t border-slate-200">
           <div className="text-[11px] font-semibold text-slate-500 mb-2 flex items-center justify-between">
-            <span>DEMO PERSONAS (1-CLICK LOGIN)</span>
-            <span className="text-[10px] text-slate-400">Default password loaded</span>
+            <span>{t('demo_personas_title', 'DEMO PERSONAS (1-CLICK LOGIN)')}</span>
+            <span className="text-[10px] text-slate-400">{t('default_password_loaded', 'Default password loaded')}</span>
           </div>
 
           <div className="grid grid-cols-2 gap-2 text-xs">
             <button
               onClick={() => handleQuickDemoLogin('rahul.sharma@example.gov.in')}
-              className="p-2 bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded text-left transition-colors"
+              className="p-2 bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded text-left transition-colors cursor-pointer"
             >
               <div className="font-bold text-slate-900">Rahul Sharma</div>
-              <div className="text-[10px] text-slate-500">Citizen (Applicant)</div>
+              <div className="text-[10px] text-slate-500">{t('persona_citizen_role', 'Citizen (Applicant)')}</div>
             </button>
 
             <button
               onClick={() => handleQuickDemoLogin('officer.msins@example.gov.in')}
-              className="p-2 bg-slate-50 hover:bg-emerald-50 border border-emerald-300 bg-emerald-50/50 rounded text-left transition-colors"
+              className="p-2 bg-slate-50 hover:bg-emerald-50 border border-emerald-300 bg-emerald-50/50 rounded text-left transition-colors cursor-pointer"
             >
               <div className="font-bold text-emerald-900">Officer MSInS</div>
-              <div className="text-[10px] text-emerald-700">Skills & Innovation</div>
+              <div className="text-[10px] text-emerald-700">{t('persona_msins_role', 'Skills & Innovation')}</div>
             </button>
 
             <button
               onClick={() => handleQuickDemoLogin('officer.industries@example.gov.in')}
-              className="p-2 bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded text-left transition-colors"
+              className="p-2 bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded text-left transition-colors cursor-pointer"
             >
               <div className="font-bold text-slate-900">Officer Industries</div>
-              <div className="text-[10px] text-slate-500">Nodal Officer</div>
+              <div className="text-[10px] text-slate-500">{t('persona_industries_role', 'Nodal Officer')}</div>
             </button>
 
             <button
               onClick={() => handleQuickDemoLogin('admin.mahagov@example.gov.in')}
-              className="p-2 bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded text-left transition-colors"
+              className="p-2 bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 rounded text-left transition-colors cursor-pointer"
             >
               <div className="font-bold text-slate-900">Admin Mahagov</div>
-              <div className="text-[10px] text-slate-500">System Admin</div>
+              <div className="text-[10px] text-slate-500">{t('persona_admin_role', 'System Admin')}</div>
             </button>
           </div>
         </div>
@@ -167,3 +169,4 @@ export const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose }) => {
     </div>
   );
 };
+

@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Clock, AlertTriangle, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
 
 interface SlaCountdownTimerProps {
   createdAt: string;
@@ -14,6 +15,7 @@ export const SlaCountdownTimer: React.FC<SlaCountdownTimerProps> = ({
   status,
   compact = false
 }) => {
+  const { language, tNum } = useLanguage();
   const [timeLeft, setTimeLeft] = useState<{
     hours: number;
     minutes: number;
@@ -64,7 +66,7 @@ export const SlaCountdownTimer: React.FC<SlaCountdownTimerProps> = ({
     return (
       <div className={`inline-flex items-center gap-1.5 font-medium ${compact ? 'text-[10px]' : 'text-xs'} text-emerald-800 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded`}>
         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
-        <span>Delivered within SLA</span>
+        <span>{language === 'mr' ? 'विहित मुदतीत निकाली' : 'Delivered within SLA'}</span>
       </div>
     );
   }
@@ -72,7 +74,7 @@ export const SlaCountdownTimer: React.FC<SlaCountdownTimerProps> = ({
   if (status === 'REJECTED') {
     return (
       <div className={`inline-flex items-center gap-1.5 font-medium ${compact ? 'text-[10px]' : 'text-xs'} text-slate-600 bg-slate-100 border border-slate-200 px-2 py-0.5 rounded`}>
-        <span>Processed & Closed</span>
+        <span>{language === 'mr' ? 'निकाली व बंद' : 'Processed & Closed'}</span>
       </div>
     );
   }
@@ -82,7 +84,11 @@ export const SlaCountdownTimer: React.FC<SlaCountdownTimerProps> = ({
     return (
       <div className={`inline-flex items-center gap-1 font-bold ${compact ? 'text-[10px]' : 'text-xs'} text-red-800 bg-red-100 border border-red-300 px-2 py-0.5 rounded animate-pulse`}>
         <ShieldAlert className="w-3.5 h-3.5 text-red-600" />
-        <span>RTS SLA Breached (+{timeLeft.hours}h {timeLeft.minutes}m)</span>
+        <span>
+          {language === 'mr'
+            ? `लोकसेवा हमी मुदत उलटली (+${tNum(timeLeft.hours)} तास ${tNum(timeLeft.minutes)} मि)`
+            : `RTS SLA Breached (+${timeLeft.hours}h ${timeLeft.minutes}m)`}
+        </span>
       </div>
     );
   }
@@ -98,9 +104,13 @@ export const SlaCountdownTimer: React.FC<SlaCountdownTimerProps> = ({
           <Clock className="w-3.5 h-3.5 text-emerald-700" />
         )}
         <span>
-          {timeLeft.hours}h {timeLeft.minutes}m remaining
+          {language === 'mr'
+            ? `${tNum(timeLeft.hours)} तास ${tNum(timeLeft.minutes)} मि शिल्लक`
+            : `${timeLeft.hours}h ${timeLeft.minutes}m remaining`}
         </span>
-        <span className="text-[10px] text-slate-400 font-normal">({slaHours}h RTS SLA)</span>
+        <span className="text-[10px] text-slate-400 font-normal">
+          ({tNum(slaHours)}{language === 'mr' ? ' तास लोकसेवा हमी' : 'h RTS SLA'})
+        </span>
       </div>
 
       {!compact && (

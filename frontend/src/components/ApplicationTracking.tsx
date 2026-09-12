@@ -12,6 +12,7 @@ import {
 } from 'lucide-react';
 import { fetchTrackingDetails, ApplicationTrackingData } from '../services/eventService';
 import { SlaCountdownTimer } from './SlaCountdownTimer';
+import { useLanguage } from '../context/LanguageContext';
 
 interface ApplicationTrackingProps {
   initialAppNumber?: string;
@@ -22,6 +23,7 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
   initialAppNumber = '',
   onClose
 }) => {
+  const { t, tDept, tService, tStatus, tNum, tCurrency, tDate } = useLanguage();
   const [searchQuery, setSearchQuery] = useState(initialAppNumber);
   const [trackingData, setTrackingData] = useState<ApplicationTrackingData | null>(null);
   const [loading, setLoading] = useState(false);
@@ -62,15 +64,15 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
   const getStatusLabel = (status: string) => {
     switch (status) {
       case 'APPROVED':
-        return { text: '● Approved & Issued', cls: 'text-[#166534] bg-emerald-50 border-emerald-200' };
+        return { text: `● ${t('status_approved', 'Approved & Issued')}`, cls: 'text-[#166534] bg-emerald-50 border-emerald-200' };
       case 'IN_REVIEW':
-        return { text: '● Under Department Review', cls: 'text-amber-800 bg-amber-50 border-amber-200' };
+        return { text: `● ${t('status_in_review', 'Under Department Review')}`, cls: 'text-amber-800 bg-amber-50 border-amber-200' };
       case 'SUBMITTED':
-        return { text: '● Application Submitted', cls: 'text-blue-800 bg-blue-50 border-blue-200' };
+        return { text: `● ${t('status_submitted', 'Application Submitted')}`, cls: 'text-blue-800 bg-blue-50 border-blue-200' };
       case 'REJECTED':
-        return { text: '● Application Rejected', cls: 'text-red-800 bg-red-50 border-red-200' };
+        return { text: `● ${t('status_rejected', 'Application Rejected')}`, cls: 'text-red-800 bg-red-50 border-red-200' };
       default:
-        return { text: `● ${status}`, cls: 'text-slate-700 bg-slate-100 border-slate-200' };
+        return { text: `● ${tStatus(status)}`, cls: 'text-slate-700 bg-slate-100 border-slate-200' };
     }
   };
 
@@ -81,15 +83,15 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
       <div className="bg-white border border-[#E5E7E3] rounded-md p-5 shadow-xs space-y-4">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-base font-bold text-slate-900">Application Tracking & Audit Timeline</h2>
-            <p className="text-xs text-slate-500 mt-0.5">Track your application status and verified inter-department data history</p>
+            <h2 className="text-base font-bold text-slate-900">{t('track_title', 'Application Tracking & Audit Timeline')}</h2>
+            <p className="text-xs text-slate-500 mt-0.5">{t('track_subtitle', 'Track your application status and verified inter-department data history')}</p>
           </div>
           {onClose && (
             <button 
               onClick={onClose}
               className="text-xs text-slate-600 hover:text-slate-900 px-2.5 py-1 rounded bg-slate-100 border border-slate-200"
             >
-              Close
+              {t('close_btn', 'Close')}
             </button>
           )}
         </div>
@@ -102,7 +104,7 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Enter Application Tracking Number (e.g. APP-2026-IND-00142)..."
+                placeholder={t('track_input_placeholder', 'Enter Application Tracking Number (e.g. APP-2026-IND-00142)...')}
                 className="w-full pl-9 pr-3 py-2 bg-slate-50 border border-slate-300 rounded text-sm text-slate-900 font-mono placeholder-slate-400 focus:outline-none focus:border-emerald-700 focus:bg-white"
               />
             </div>
@@ -116,7 +118,7 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
               ) : (
                 <>
                   <Search className="w-3.5 h-3.5" />
-                  <span>Search</span>
+                  <span>{t('search_btn', 'Search')}</span>
                 </>
               )}
             </button>
@@ -124,7 +126,7 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
 
           {/* Quick Demo Pre-filled Test Pills */}
           <div className="flex flex-wrap items-center gap-2 pt-1">
-            <span className="text-xs text-slate-500 font-medium">Quick Demo Samples:</span>
+            <span className="text-xs text-slate-500 font-medium">{t('quick_demo_samples', 'Quick Demo Samples:')}</span>
             <button
               type="button"
               onClick={() => {
@@ -133,7 +135,7 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
               }}
               className="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 rounded text-xs font-mono font-semibold border border-emerald-200 transition flex items-center gap-1"
             >
-              <span>🔍</span> APP-2026-IND-00142 (Business License)
+              <span>🔍</span> APP-2026-IND-00142 ({t('srv_biz_license', 'Business License')})
             </button>
             <button
               type="button"
@@ -143,7 +145,7 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
               }}
               className="px-2.5 py-1 bg-blue-50 hover:bg-blue-100 text-blue-800 rounded text-xs font-mono font-semibold border border-blue-200 transition flex items-center gap-1"
             >
-              <span>🔍</span> APP-2026-MSINS-00912 (MSInS Seed Grant)
+              <span>🔍</span> APP-2026-MSINS-00912 ({t('srv_seed_grant', 'MSInS Seed Grant')})
             </button>
           </div>
         </form>
@@ -164,11 +166,11 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
           <div className="bg-white border border-[#E5E7E3] rounded-md p-5 space-y-4 shadow-xs">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-100">
               <div>
-                <span className="text-xs font-mono font-semibold text-slate-500">Tracking Number: {trackingData.application_number}</span>
-                <h3 className="text-lg font-bold text-slate-900 mt-0.5">{trackingData.service_title}</h3>
+                <span className="text-xs font-mono font-semibold text-slate-500">{t('tracking_number_label', 'Tracking Number:')} {tNum(trackingData.application_number)}</span>
+                <h3 className="text-lg font-bold text-slate-900 mt-0.5">{tService(trackingData.service_title)}</h3>
                 <p className="text-xs text-slate-600 flex items-center gap-1.5 mt-0.5">
                   <Building2 className="w-3.5 h-3.5 text-slate-400" />
-                  <span>{trackingData.department_name}</span>
+                  <span>{tDept(trackingData.department_name)}</span>
                 </p>
               </div>
 
@@ -182,7 +184,7 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
                   <SlaCountdownTimer createdAt={trackingData.created_at} status={trackingData.status} />
                 </div>
                 <p className="text-[11px] text-slate-500">
-                  Updated: {new Date(trackingData.updated_at).toLocaleString('en-IN')}
+                  {t('updated_label', 'Updated:')} {tDate(trackingData.updated_at)}
                 </p>
               </div>
             </div>
@@ -192,12 +194,12 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
               <div className="bg-emerald-50 border border-emerald-200 rounded p-3 text-xs">
                 <div className="font-semibold text-emerald-900 flex items-center gap-1.5 mb-1">
                   <Link2 className="w-3.5 h-3.5 text-emerald-700" />
-                  <span>Verified Cross-Department Information</span>
+                  <span>{t('verified_cross_dept_info', 'Verified Cross-Department Information')}</span>
                 </div>
                 <div className="grid sm:grid-cols-3 gap-2 text-slate-700 font-mono text-[11px] pt-1">
-                  <div>Providing Dept: <strong>Revenue Department</strong></div>
-                  <div>Certificate #: <strong>{trackingData.application_data.income_certificate_number}</strong></div>
-                  <div>Verified Income: <strong>₹{Number(trackingData.application_data.verified_annual_income || 0).toLocaleString('en-IN')}</strong></div>
+                  <div>{t('providing_dept_label', 'Providing Dept:')} <strong>{t('dept_revenue_name', 'Revenue Department')}</strong></div>
+                  <div>{t('cert_num_label', 'Certificate #:')} <strong>{tNum(trackingData.application_data.income_certificate_number)}</strong></div>
+                  <div>{t('verified_income_label', 'Verified Income:')} <strong>{tCurrency(trackingData.application_data.verified_annual_income)}</strong></div>
                 </div>
               </div>
             )}
@@ -209,7 +211,7 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
                 className="text-slate-600 hover:text-slate-900 flex items-center gap-1 text-xs font-medium"
               >
                 <RefreshCw className="w-3.5 h-3.5" />
-                <span>Refresh Status</span>
+                <span>{t('refresh_status', 'Refresh Status')}</span>
               </button>
 
               <div className="flex items-center gap-2">
@@ -218,7 +220,7 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
                   className="bg-slate-100 hover:bg-slate-200 text-slate-800 px-3 py-1.5 rounded border border-slate-300 font-medium flex items-center gap-1"
                 >
                   <Printer className="w-3.5 h-3.5" />
-                  <span>Print Receipt</span>
+                  <span>{t('print_receipt', 'Print Receipt')}</span>
                 </button>
 
                 {trackingData.status === 'APPROVED' && (
@@ -227,7 +229,7 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
                     className="bg-[#166534] hover:bg-[#15803D] text-white px-3 py-1.5 rounded font-semibold flex items-center gap-1 cursor-pointer transition-colors"
                   >
                     <Download className="w-3.5 h-3.5" />
-                    <span>Download Certificate</span>
+                    <span>{t('download_cert', 'Download Certificate')}</span>
                   </button>
                 )}
               </div>
@@ -237,7 +239,7 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
               <div className="bg-emerald-50 border border-emerald-200 text-emerald-900 rounded p-3 text-xs flex items-start justify-between gap-2 animate-fadeIn">
                 <div className="flex items-center gap-2">
                   <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse"></span>
-                  <span><strong>Verified Authenticity:</strong> {downloadSuccessMsg}</span>
+                  <span><strong>{t('verified_authenticity', 'Verified Authenticity:')}</strong> {downloadSuccessMsg}</span>
                 </div>
                 <button 
                   onClick={() => setDownloadSuccessMsg(null)}
@@ -252,8 +254,8 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
           {/* CLEAN VERTICAL TIMELINE */}
           <div className="bg-white border border-[#E5E7E3] rounded-md p-5 space-y-4 shadow-xs">
             <h4 className="text-sm font-bold text-slate-900 flex items-center justify-between pb-3 border-b border-slate-100">
-              <span>Lifecycle Timeline & Event Log</span>
-              <span className="text-xs font-normal text-slate-500">{trackingData.events.length} recorded actions</span>
+              <span>{t('lifecycle_timeline_title', 'Lifecycle Timeline & Event Log')}</span>
+              <span className="text-xs font-normal text-slate-500">{tNum(trackingData.events.length)} {t('recorded_actions_count', 'recorded actions')}</span>
             </h4>
 
             <div className="relative pl-6 space-y-6 before:absolute before:left-2 before:top-2 before:bottom-2 before:w-0.5 before:bg-slate-200">
@@ -268,10 +270,10 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
                     <div className="flex flex-wrap items-center justify-between gap-1">
                       <div className="font-bold text-slate-900 flex items-center gap-2">
                         <span>{evt.event_type}</span>
-                        <span className="font-normal text-slate-500">• By {evt.actor_name}</span>
+                        <span className="font-normal text-slate-500">• {t('by_actor', 'By')} {evt.actor_name}</span>
                       </div>
                       <span className="text-[11px] text-slate-400 font-mono">
-                        {new Date(evt.created_at).toLocaleString('en-IN')}
+                        {tDate(evt.created_at)}
                       </span>
                     </div>
 
@@ -283,7 +285,7 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
                           onClick={() => toggleEventMetadata(evt.id)}
                           className="text-[11px] text-slate-500 hover:text-emerald-800 font-mono flex items-center gap-1"
                         >
-                          <span>{showEventJson[evt.id] ? 'Hide technical details' : 'View technical details'}</span>
+                          <span>{showEventJson[evt.id] ? t('hide_tech_details', 'Hide technical details') : t('view_tech_details', 'View technical details')}</span>
                           {showEventJson[evt.id] ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                         </button>
 
@@ -307,3 +309,4 @@ export const ApplicationTracking: React.FC<ApplicationTrackingProps> = ({
     </div>
   );
 };
+

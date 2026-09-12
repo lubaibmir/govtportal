@@ -8,6 +8,7 @@ import {
   ShieldAlert
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { fetchBeneficiary360, Beneficiary360Data } from '../services/beneficiaryService';
 
 export interface Beneficiary360ModalProps {
@@ -24,6 +25,7 @@ export const Beneficiary360Modal: React.FC<Beneficiary360ModalProps> = ({
   onClose
 }) => {
   const { token: authToken } = useAuth();
+  const { language, tNum, tCurrency } = useLanguage();
   const token = propToken || authToken;
   const [data, setData] = useState<Beneficiary360Data | null>(null);
   const [loading, setLoading] = useState(false);
@@ -90,30 +92,30 @@ export const Beneficiary360Modal: React.FC<Beneficiary360ModalProps> = ({
             {/* Top Stat Summary Grid */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-lg">
-                <div className="text-slate-500 font-semibold uppercase text-[10px]">Federated Registries</div>
-                <div className="text-xl font-bold text-slate-900 mt-1">{data.federated_identities.length} Depts</div>
+                <div className="text-slate-500 font-semibold uppercase text-[10px]">{language === 'mr' ? 'संलग्न नोंदवह्या' : 'Federated Registries'}</div>
+                <div className="text-xl font-bold text-slate-900 mt-1">{tNum(data.federated_identities.length)} {language === 'mr' ? 'विभाग' : 'Depts'}</div>
               </div>
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-lg">
-                <div className="text-slate-500 font-semibold uppercase text-[10px]">Total Applications</div>
-                <div className="text-xl font-bold text-slate-900 mt-1">{data.total_applications}</div>
+                <div className="text-slate-500 font-semibold uppercase text-[10px]">{language === 'mr' ? 'एकूण अर्ज' : 'Total Applications'}</div>
+                <div className="text-xl font-bold text-slate-900 mt-1">{tNum(data.total_applications)}</div>
               </div>
               <div className="bg-slate-50 border border-slate-200 p-3 rounded-lg">
-                <div className="text-slate-500 font-semibold uppercase text-[10px]">Active Consents</div>
-                <div className="text-xl font-bold text-slate-900 mt-1">{data.total_consents}</div>
+                <div className="text-slate-500 font-semibold uppercase text-[10px]">{language === 'mr' ? 'सक्रिय संमती' : 'Active Consents'}</div>
+                <div className="text-xl font-bold text-slate-900 mt-1">{tNum(data.total_consents)}</div>
               </div>
               <div className="bg-emerald-50 border border-emerald-200 p-3 rounded-lg">
-                <div className="text-emerald-800 font-semibold uppercase text-[10px]">Total Benefits Received</div>
-                <div className="text-xl font-bold text-emerald-900 mt-1">₹{data.total_benefits_disbursed_inr.toLocaleString('en-IN')}</div>
+                <div className="text-emerald-800 font-semibold uppercase text-[10px]">{language === 'mr' ? 'प्राप्त एकूण लाभ' : 'Total Benefits Received'}</div>
+                <div className="text-xl font-bold text-emerald-900 mt-1">{tCurrency(data.total_benefits_disbursed_inr)}</div>
               </div>
             </div>
 
             {/* Navigation Tabs */}
             <div className="flex items-center gap-2 border-b border-slate-200 pb-2 text-xs">
               {[
-                { id: 'IDENTITIES', label: 'Federated Identity Graph (MDM)', icon: Layers },
-                { id: 'APPLICATIONS', label: `Service Applications (${data.applications.length})`, icon: FileText },
-                { id: 'CONSENTS', label: `Consent Ledger (${data.consents.length})`, icon: ShieldCheck },
-                { id: 'GRIEVANCES', label: `RTS Grievances (${data.grievances.length})`, icon: ShieldAlert }
+                { id: 'IDENTITIES', label: language === 'mr' ? 'एकात्मिक ओळख आलेख (MDM)' : 'Federated Identity Graph (MDM)', icon: Layers },
+                { id: 'APPLICATIONS', label: language === 'mr' ? `शासकीय अर्ज (${tNum(data.applications.length)})` : `Service Applications (${data.applications.length})`, icon: FileText },
+                { id: 'CONSENTS', label: language === 'mr' ? `संमती नोंदवही (${tNum(data.consents.length)})` : `Consent Ledger (${data.consents.length})`, icon: ShieldCheck },
+                { id: 'GRIEVANCES', label: language === 'mr' ? `RTS तक्रारी (${tNum(data.grievances.length)})` : `RTS Grievances (${data.grievances.length})`, icon: ShieldAlert }
               ].map((tab) => {
                 const Icon = tab.icon;
                 return (
