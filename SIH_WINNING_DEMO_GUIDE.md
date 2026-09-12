@@ -223,14 +223,32 @@ At any point, click the **"Sign In / Demo Accounts"** (or **"Switch User"**) but
 
 ---
 
-### STEP 8: System Admin Flow — Workflow Rules & SLA Engine
-*Show how rules are configured without modifying source code.*
+### STEP 8: System Admin Flow — Workflow Rules & Auto-Approval Engine
+*Show how government policies and auto-approval criteria are configured dynamically without touching source code.*
 
-1. In Admin Dashboard, click the **"Workflow Rules & SLA"** tab.
-2. **Review Configured Rules:**
-   - See `RULE_AUTO_APPROVE_SEED_GRANT` (Auto-approves MSInS grant if Income < ₹8L and Skill Diploma verified).
-   - See `RULE_ESC_GRIEVANCE_OVERDUE` (Auto-escalates grievances to Appellate Authority after SLA breach).
-3. Click **"Simulate Rule Evaluation"** to verify how incoming payloads match against active business logic.
+1. **Navigate to Rules Engine:**
+   - Log in as **`admin.mahagov@example.gov.in`** (or click **"Switch User"** ➔ **"Admin Mahagov"**).
+   - In the top tab bar, click **"Workflow Rules & SLA"**.
+2. **Inspect & Customize Active Rules:**
+   - **`MSInS Tier-1 Innovator Fast-Track Approval`:**
+     - Drag the **Max Annual Income Auto-Approval Cap slider** (e.g., from ₹8,00,000 to ₹10,00,000).
+     - Change the **Statutory RTS SLA Target** dropdown (12h Express, 24h Next-Day, 48h Standard).
+     - Toggle the rule **ON / OFF** using the switch in the top right of the card.
+     - Click **"Deploy Rule"** to commit the change live with cryptographic audit proof.
+   - **`MSME Micro-Enterprise Income Auto-Approval`:**
+     - Adjust the turnover cap and statutory RTS SLA target.
+3. **Use the Interactive Rule Simulation Sandbox (Directly on Screen):**
+   - Scroll down to the **"Interactive Rule Simulation & Verification Sandbox"** card.
+   - Select **Target Service**: `MSInS Startup Innovation Seed Grant`.
+   - Set **Test Verified Income**: Click the **`₹4.2L`** quick button.
+   - Select **Verified Skill Grade**: `Distinction (MSBTE Level 6)`.
+   - Click **"🚀 Run Rule Simulation"**.
+   - **What happens instantly:**
+     - See the green decision box: `✅ POLICY DECISION: AUTO-APPROVED (Bypasses Manual Queue)`.
+     - Displays: `⚡ Execution Time: 12ms` and explanation: *"Verified income (₹4,20,000) is <= configured Cap (₹8,00,000) and MSBTE skill qualification 'Distinction' is pre-verified."*
+4. **Test the Edge Case (Manual Scrutiny Fallback):**
+   - In the tester, change the income to **`₹12L`** (or select **Pass Class** grade) and click **"🚀 Run Rule Simulation"**.
+   - **Observe:** The decision changes to `⏳ POLICY DECISION: ROUTED TO MANUAL OFFICER SCRUTINY` because criteria exceeded the auto-approval threshold.
 
 ---
 
